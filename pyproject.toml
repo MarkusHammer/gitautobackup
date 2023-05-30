@@ -1,0 +1,74 @@
+#python -m pip install pip-tools validate-pyproject[all] build twine
+#validate-pyproject pyproject.toml
+#pip-compile pyproject.toml
+#python -m build
+#twine upload dist/* -u USERNAME -p PASSWORD --verbose # add -r gitautobackup when updating
+
+#pyproject.toml for gitautobackup python module
+#THX https://packaging.python.org/en/latest/specifications/declaring-project-metadata/#entry-points
+#THX https://pypi.org/project/validate-pyproject/
+
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gitautobackup"
+dependencies = ["pathlib", "GitPython", "typing-extensions;python_version<'3.8'"]
+requires-python = ">=3.0"
+
+#fullname = "Git Auto Backup Tool"
+dynamic = ["version", "readme"]
+description = "A basic CLI program and python moldule that allows for quickly making and comming changes to a git repository, along with a few other tools"
+authors = [{ name = "Markus Hammer", email = "107761433+MarkusHammer@users.noreply.github.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Typing :: Typed",
+    "Natural Language :: English",
+    "Topic :: Software Development :: Version Control",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Topic :: System :: Archiving",
+    "Topic :: System :: Archiving :: Backup",
+    "Topic :: System :: Software Distribution",
+    "Topic :: Utilities",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3"
+]
+keywords = [
+    "backup",
+    "git", 
+    "commit",
+    "managment",
+    "tool",
+    "devtool",
+    "small",
+    "simple",
+    "development",
+    "utility"
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "gitautobackup.__version__"}
+readme = {file = ["README.md"], content-type = "text/markdown"}
+
+[project.optional-dependencies]
+cli = ["argparse"]
+dev = ["setuptools>=61.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/MarkusHammer/gitautobackup"
+Github  = "https://github.com/MarkusHammer/gitautobackup"
+Issues = "https://github.com/MarkusHammer/gitautobackup/issues"
+"Pull Requests" = "https://github.com/MarkusHammer/gitautobackup/pulls"
+Git = "https://github.com/MarkusHammer/gitautobackup.git"
+
+[project.scripts]
+gitautobackup = "gitautobackup:__main__"
+#autobackup = "gitautobackup:__main__"
+
+[tool.setuptools]
+zip-safe = true
