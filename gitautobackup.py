@@ -33,7 +33,7 @@ try:
 except ImportError:
     from typing_extensions import Union
 
-__version__ = "1.0.1.2"
+__version__ = "1.0.1.3"
 
 def path_hunt_dir(path: Union[Path, str, None]) -> Union['Path', None]:
     """_summary_
@@ -311,7 +311,9 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
             force_compress = False
         else:
             force_compress = None
-        message = args.message.strip("'").strip('"')
+        message = args.message
+        if message is not None:
+            message = message.strip("'").strip('"')
 
         if args.verbose:
             verbose = True
