@@ -4,23 +4,23 @@ A basic CLI program and python module that allows for quickly making and comming
 
 ## Setup
 
+First off, this script uses the ``GitPython`` module, so ensure that you have a compatable version of git installed on you system so that ``GitPython`` can interface with it properly. For more info look [here](https://github.com/gitpython-developers/GitPython).
+
 If not installed via pip, than the requirements for this script must be installed in the python environment. This script requires the ``git`` python module be available in you python environment in order to run. This can also use the ``argparse`` module optionally to help greatly increase the usability on the command line (and is highly suggested). These can be installed using:
 
-``pip install git argparse[cli]``
+``pip install gitautobackup[cli]``
 
 or if you just want the module without the extra cli overhead:
 
-``pip install git argparse``
+``pip install gitautobackup``
 
-If you prefer to have this a s a standalone file and are **sure** that you have all dependences satisfied in some way you can also simply clone this repo into your project and import the ``gitautobackup.py`` file locally.
+If you prefer to have this as a standalone file and are **sure** that you have all dependences satisfied in some way you can also simply clone this repo into your project and import the ``gitautobackup.py`` file locally.
 
 ## Command Line Interface
 
-depending on how you set up this file on you system you can run this module using ``python -m gitautobackup`` if you set it up using pip or ``python ./gitautobackup.py`` or ``py ./gitautobackup.py`` if you have the gitautobackup file locally.
+Depending on how you set up this file on your system, you can run this module using ``python -m gitautobackup`` if you set it up using pip, or ``python ./gitautobackup.py`` or ``py ./gitautobackup.py`` if you have the gitautobackup file locally.
 
-While this module does not explicitly require the ``argparse`` module, it is **highly** suggested as it help greatly improve the usability and allows acess to more options.
-
-If in doubt just install ``argparse``.
+While this module does not explicitly require the ``argparse`` module, it is **highly** suggested as it help greatly improve the usability and allows acess to more options. If in doubt just install ``argparse`` if you can.
 
 ### With ``argparse``
 
@@ -47,7 +47,7 @@ There are also the traditional arguments that report various information about t
 
 ### Without ``argparse``
 
-While using this on the command line without argparse is not suggested, you may still access a diminished selection of features:
+While using this on the command line without ``argparse`` is not suggested, you may still access a diminished selection of features:
 
 - The ``-m`` or ``--message`` flag still works
 - The path of the git repository does not require a flag and can simply have it path stated. If multiple paths are given, the first one thats a valid repository will be chosen. The program will explicitly fail if none where given.
@@ -55,15 +55,15 @@ While using this on the command line without argparse is not suggested, you may 
 
 ### Command Line Interface Example
 
-If argparse is available:
+If ``argparse`` is available:
 
-```cmd:
+```bash:
 python -m gitautobackup -p "./repo" -m "automatic backup after big change" -f -fc -v
 ```
 
-If argparse is not available:
+If ``argparse`` is not available:
 
-```cmd:
+```bash:
 python -m gitautobackup "./repo" -m "automatic backup after big change"
 ```
 
@@ -93,7 +93,7 @@ This is licenced under the Mozilla Public License 2.0 (MPL 2.0) Licence. See the
 
 ## Credits
 
-This project uses the ``pathlib``, ``git`` and optionally ``argparse`` modules, all very usefull python modules. Check them out if you want to make a simple CLI script like this, or for whatever else you might be up to in python. Also thank you to the developers of these modules for making these as they helped keep my sanity in check.
+This project uses the ``pathlib``, ``GitPython`` and optionally ``argparse`` modules, all very usefull python modules. Check them out if you want to make a simple CLI script like this, or for whatever else you might be up to in python. Also thank you to the developers of these modules for making these as they helped keep my sanity in check.
 
 While not required, feel free to credit "*Markus Hammer*" (or just "*Markus*") if you find this code or script usefull for whatever you may be doing with it.
 
