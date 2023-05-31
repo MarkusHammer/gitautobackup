@@ -14,26 +14,15 @@
     https://github.com/MarkusHammer/gitautobackup
 '''
 
-# I mean I know its good pratice but I do not care for reformating all
-#  my docstrings and making the file less readable just so it fits on smaller screens.
-# No its not a run on sentince problem I can stop anytime I want damn it!
-# pylint: disable=C0301
-
-#Disable the warnings for importing out of the top level,
-# as this is used to import modules only when needed by certian functions
-# pylint: disable=C0415
-
-
-
 from pathlib import Path
-from git import Repo, InvalidGitRepositoryError
+from git import Repo, InvalidGitRepositoryError, GitCommandNotFound, NoSuchPathError, RepositoryDirtyError
 
 try:
     from typing import Union
 except ImportError:
     from typing_extensions import Union
 
-__version__ = "1.0.1.3"
+__version__ = "1.1.0.3"
 
 def path_hunt_dir(path: Union[Path, str, None]) -> Union['Path', None]:
     """_summary_
@@ -69,23 +58,23 @@ def assert_repo(path: Union[Path, str, None], allow_bare: bool = False):
     """Raises various exceptions to test if a path is or is not a git repo. This function does not return a value, use is_repo instead if you want that.
 
     Args:
-        path (Union[Path,str,None]): The path to assert is a repository. Always raises FileNotFoundError when set to None.
+        path (Union[Path,str,None]): The path to assert is a repository. Always raises NoSuchPathError when set to None.
         allow_bare (bool, optional): Don't raise InvalidGitRepositoryError if the repository is bare. Defaults to False.
 
     Raises:
         NOTE: This may not be a comprehensive list of all possible exceptions raised, as pathlib or git may raise various other exceptions as well, however what is stated below is the behaviour explicitly defined in raise statements.
         InvalidGitRepositoryError: Raised when the folder could not be opened as a git repo, if the path couldn't possibly be a git repo (if its not a directory and does not end with ".git"), or if it can be opened but it is a bare repo and allow_bare is False.
-        FileNotFoundError: Raised when the path is None or doesn't exist on the system.
+        NoSuchPathError: Raised when the path is None or doesn't exist on the system.
     """
 
     if path is None:
-        raise FileNotFoundError()
+        raise NoSuchPathError()
 
     if not isinstance(path, Path):
         path = Path(path)
 
     if not path.exists():
-        raise FileNotFoundError()
+        raise NoSuchPathError()
 
     if not (path.is_dir() or str(path).endswith(".git")):
         raise InvalidGitRepositoryError()
@@ -109,7 +98,7 @@ def is_repo(path: Union[Path, str, None], allow_bare: bool = False) -> bool:
     retval = True
     try:
         assert_repo(path, allow_bare)
-    except (InvalidGitRepositoryError, FileNotFoundError, PermissionError):
+    except (InvalidGitRepositoryError, NoSuchPathError, PermissionError):
         retval = False
     return retval
 
@@ -171,7 +160,12 @@ def get_default_file_location() -> Union[Path, None]:
     return None
 
 
-def auto_git_backup(repo_path: Union[Path, None] = None, commit_message: Union[str, None] = None, further_guess_paths: bool = False, verbose: bool = True, force_commit: bool = False, force_compress: Union[bool, None] = None) -> bool:
+def auto_git_backup(repo_path: Union[Path, None] = None,
+                    commit_message: Union[str, None] = None,
+                    further_guess_paths: bool = False, verbose: bool = True,
+                    force_commit: bool = False,
+                    force_compress: Union[bool, None] = None
+                    ) -> bool:
     """_summary_
 
     Args:
@@ -185,7 +179,7 @@ def auto_git_backup(repo_path: Union[Path, None] = None, commit_message: Union[s
     Raises:
         NOTE: This may not be a comprehensive list of all possible exceptions raised, as pathlib or git may raise various other exceptions as well, however what is stated below is the behaviour explicitly defined in raise statements.
         InvalidGitRepositoryError: Raised when the folder could not be opened as a git repo, if the path couldn't possibly be a git repo (if its not a directory and does not end with ".git"), or if it can be opened but it is a bare repo and allow_bare is False.
-        FileNotFoundError: Raised when the path doesn't exist on the system.
+        NoSuchPathError: Raised when the path doesn't exist on the system.
 
     Returns:
         bool: Weather or not a commit was made.
@@ -210,7 +204,7 @@ def auto_git_backup(repo_path: Union[Path, None] = None, commit_message: Union[s
 
     repo_path = Path(repo_path)
     if not repo_path.exists():
-        raise FileNotFoundError()
+        raise NoSuchPathError()
     while not is_repo(repo_path) and len(repo_path.parents) > 0:
         repo_path = repo_path.parent
     assert_repo(repo_path)
@@ -232,6 +226,8 @@ def auto_git_backup(repo_path: Union[Path, None] = None, commit_message: Union[s
             cmd_args = []
             if force_commit:
                 cmd_args.append("--allow-empty")
+            if verbose:
+                cmd_args.append("--verbose")
             msg = repo.git.commit(cmd_args, m=commit_message)
             if verbose and msg != "":
                 pprint(msg)
@@ -244,13 +240,13 @@ def auto_git_backup(repo_path: Union[Path, None] = None, commit_message: Union[s
             if verbose and msg != "":
                 pprint(msg)
 
-    # TODO LONGTERM git reflog expire can it also be a feature?
-
     return made_a_backup
 
 
 def main(*args, prog_arg: Union[str, None] = None) -> bool:
-    """A function that run the main entry point for the cli interface of the program. This allows for you to use this as you would normally via the cli but still import this as a module. Please not however that argv is only intended for the cli arguments and not for the name of the script running this, thats what the optional prog_arg argument is intended for.
+    """A function that when used as a module acts as the main entry point of the program. This allows for you to use this as you would normally via the cli but still import this as a module.
+    Please note however that argv is only intended for the cli arguments and not for the name of the script running this, thats what the optional prog_arg argument is intended for.
+    Also note that this function does not handle exceptions unlike how the cli turns these into user friendly messages. This is intended as the user of a module will most likely find these exceptions usefull.
 
     Args:
         *args (Tuple[None]): The arguments form the command line, sans the one with the name of this program (what the sys module's argv puts in the [0]th spot), thats what prog_arg is for.
@@ -362,7 +358,25 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
 
 def __main__():
     from sys import (exit as end, argv)
-    end(main(argv[1:], prog_arg=argv[0]))
+
+    scode = -1
+
+    try:
+        scode = 0 if main(argv[1:], prog_arg=argv[0]) else 1
+    except GitCommandNotFound:
+        print("Your system is not set up properly for use with the GitPython module. Please refer to it's documentation for setting it up before running this script.")
+    except (NoSuchPathError, FileNotFoundError, PermissionError):
+        print("The given path does not exist on this system or could not be accessed by this user.")
+        scode = -2
+    except InvalidGitRepositoryError:
+        print("The folder given is not a git repo, or is bare.")
+        scode = -3
+    except RepositoryDirtyError:
+        print("The repository already has some changes that could end up being overwritten. Please Handle these first before running this.")
+        scode = -4
+
+    end(scode)
+
 
 if __name__ == "__main__":
     __main__()

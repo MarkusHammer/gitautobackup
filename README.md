@@ -6,21 +6,25 @@ A basic CLI program and python module that allows for quickly making and comming
 
 First off, this script uses the ``GitPython`` module, so ensure that you have a compatable version of git installed on you system so that ``GitPython`` can interface with it properly. For more info look [here](https://github.com/gitpython-developers/GitPython).
 
-If not installed via pip, than the requirements for this script must be installed in the python environment. This script requires the ``git`` python module be available in you python environment in order to run. This can also use the ``argparse`` module optionally to help greatly increase the usability on the command line (and is highly suggested). These can be installed using:
+If not installed via pip, than the requirements for this script must be installed in the python environment. This script requires the ``git`` python module be available in you python environment in order to run. This can also use the ``argparse`` module optionally to help greatly increase the usability on the command line (and is highly suggested), as well as the ``pprint`` module for better formating of verbose outputs. These can be installed using:
 
 ``pip install gitautobackup[cli]``
 
-or if you just want the module without the extra cli overhead:
+or if you just want the module without the extra cli overhead (not suggested):
 
 ``pip install gitautobackup``
 
 If you prefer to have this as a standalone file and are **sure** that you have all dependences satisfied in some way you can also simply clone this repo into your project and import the ``gitautobackup.py`` file locally.
+
+> Please note that if this is the method you use to ensure that the path is specified as if not it will default to the current terminal working directory which if set to the location of the clone of this repository will result in making a commit to this project's clone. I only say this as this is a mistake I have made myself quite a few times.
 
 ## Command Line Interface
 
 Depending on how you set up this file on your system, you can run this module using ``python -m gitautobackup`` if you set it up using pip, or ``python ./gitautobackup.py`` or ``py ./gitautobackup.py`` if you have the gitautobackup file locally.
 
 While this module does not explicitly require the ``argparse`` module, it is **highly** suggested as it help greatly improve the usability and allows acess to more options. If in doubt just install ``argparse`` if you can.
+
+Unlike argparse, ``pprint`` is a purley aesthetic module which is not at all needed other than for more friendly formating of the output of large blocks of text (something only commonly seen when using verbose output).
 
 ### With ``argparse``
 
