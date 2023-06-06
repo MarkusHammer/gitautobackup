@@ -61,7 +61,7 @@
     ### validate-pyproject pyproject.toml
     ### pip-compile pyproject.toml
     ### py -3.10 -m build
-    ### twine upload dist/* --verbose -u USERNAME -p PASSWORD
+    ### twine upload dist/* --verbose
 
 [tool.setuptools]
     zip-safe = true

@@ -35,19 +35,24 @@ This module does not have any required arguments, as everything does have a defa
 3. The location of this file itself
    For those wanting to acess this logic when using this a  a module the ``get_default_git_location()`` function will return this value.
 
-- ``-p`` or ``--path`` specifies the repository path
-- ``-m`` or ``--message`` (or others) specifies the commit's message.
-- ``-f``, ``--force``, or ``--forcecommit`` makes a commit be made even if nothing was changed
-- ``--fc``, ``--forcecompress`` forces the repository's database to always be compressed, even if it not really necessary. This cannot be combined with ``--fnc``
-- ``--fnc``, ``--forcenocompress`` forces the repository's database to never be compressed, even if it might be beneficial. This cannot be combined with ``--fc``
-- ``-v``, ``--verbose`` makes the output of the program more noisy. This cannot be combined with ``-q``
-- ``-q``, ``--quiet`` greatly reduces the output of the program. This cannot be combined with ``-v``
+Here are a few of the possible arguments to use:
+
+- ``-p`` / ``--path`` specifies the repository path
+- ``-m`` / ``--message`` specifies the commit's message.
+- ``-t`` / ``--tag`` sets a tag for the commit
+- ``-a`` / ``--archive`` / ``--archive_path`` sets a path for a archive file to be made. If this isn't used a archive file will not be made.
+- ``-f`` / ``--force`` / ``--force_commit`` makes a commit be made even if nothing was changed
+- ``--fc`` / ``--force_compress`` forces the repository's database to always be compressed, even if its not really necessary. This cannot be combined with ``--fnc`` or ``--fca``
+- ``--fnc`` / ``--force_no_compress`` forces the repository's database to never be compressed, even if it might be beneficial. This cannot be combined with ``--fc`` or ``--fca``
+- ``--fca`` / ``--force_compress_aggressive`` forces the repository's database compressed aggressively (taking a much longer time), even if its not necessary. This cannot be combined with ``--fc`` or ``--fnc``
+- ``-v`` / ``--verbose`` makes the output of the program more noisy. This cannot be combined with ``-q``
+- ``-q`` / ``--quiet`` greatly reduces the output of the program. This cannot be combined with ``-v``
 
 There are also the traditional arguments that report various information about this software then exit:
 
-- ``--ver`` or ``--version`` prints the program version and then exits. You don't need a input file if you run this command.
-- ``-h`` or ``--help`` prints some details about the programs arguments and then exits. You don't need a input file if you run this command.
-- ``--git`` or ``--github`` prints a like to the github repository and then exits. You don't need a input file if you run this command.
+- ``--ver`` / ``--version`` prints the program version and then exits. You don't need a input file if you run this command.
+- ``-h`` / ``--help`` prints some details about the programs arguments and then exits. You don't need a input file if you run this command.
+- ``--git`` / ``--github`` prints a like to the github repository and then exits. You don't need a input file if you run this command.
 
 ### Without ``argparse``
 
