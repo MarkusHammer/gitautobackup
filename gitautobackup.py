@@ -14,7 +14,7 @@
     https://github.com/MarkusHammer/gitautobackup
 '''
 
-__version__ = "2.0.0.0"
+__version__ = "2.0.0.1"
 
 from git import Repo, InvalidGitRepositoryError, GitCommandNotFound, NoSuchPathError, RepositoryDirtyError, GitError
 
