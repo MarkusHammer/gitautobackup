@@ -40,7 +40,7 @@
         "utility"
     ]
     [project.optional-dependencies]
-        cli = ["argparse", "pprint"]
+        cli = ["argparse"]
         dev = ["setuptools>=64.0.0", "pip-tools", "validate-pyproject[all]", "build", "twine"]
     [project.scripts] 
         gitautobackup = "gitautobackup:__main__"
@@ -55,13 +55,6 @@
 [build-system]
     requires = ["setuptools>=64.0.0"]
     build-backend = "setuptools.build_meta"
-    
-    ### NOTE THIS MUST BE BUILT ON A VERSION OF PYTHON >= 3.10, 3.9.1 and 3.8.7 #THX https://github.com/pypa/build/issues/255#issuecomment-794560752
-    ### py -3.10 -m pip install pip-tools validate-pyproject[all] build twine setuptools
-    ### validate-pyproject pyproject.toml
-    ### pip-compile pyproject.toml
-    ### py -3.10 -m build
-    ### twine upload dist/* --verbose
 
 [tool.setuptools]
     zip-safe = true
@@ -72,3 +65,10 @@
 [tool.pylint."MESSAGES CONTROL"]
     disable = "C0301, C0415"
     # Disables the warnings for importing out of the top level and long lines
+
+### NOTE THIS MUST BE BUILT ON A VERSION OF PYTHON >= 3.10, 3.9.1 and 3.8.7 #THX https://github.com/pypa/build/issues/255#issuecomment-794560752
+### py -3.10 -m pip install pip-tools validate-pyproject[all] build twine setuptools
+### validate-pyproject pyproject.toml
+### pip-compile --resolver=backtracking pyproject.toml
+### py -3.10 -m build
+### twine upload dist/* --verbose

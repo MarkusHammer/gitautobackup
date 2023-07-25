@@ -42,9 +42,9 @@ Here are a few of the possible arguments to use:
 - ``-t`` / ``--tag`` sets a tag for the commit
 - ``-a`` / ``--archive`` / ``--archive_path`` sets a path for a archive file to be made. If this isn't used a archive file will not be made.
 - ``-f`` / ``--force`` / ``--force_commit`` makes a commit be made even if nothing was changed
-- ``--fc`` / ``--force_compress`` forces the repository's database to always be compressed, even if its not really necessary. This cannot be combined with ``--fnc`` or ``--fca``
-- ``--fnc`` / ``--force_no_compress`` forces the repository's database to never be compressed, even if it might be beneficial. This cannot be combined with ``--fc`` or ``--fca``
-- ``--fca`` / ``--force_compress_aggressive`` forces the repository's database compressed aggressively (taking a much longer time), even if its not necessary. This cannot be combined with ``--fc`` or ``--fnc``
+- ``--fc`` / ``--force_cleanup`` forces the repository's database to always be cleaned, even if its not really necessary. This cannot be combined with ``--fnc`` or ``--fca``
+- ``--fnc`` / ``--force_no_cleanup`` forces the repository's database to never be cleaned, even if it might be beneficial. This cannot be combined with ``--fc`` or ``--fca``
+- ``--fca`` / ``--force_cleanup_aggressive`` forces the repository's database cleaned aggressively (taking a much longer time), even if its not necessary. This cannot be combined with ``--fc`` or ``--fnc``
 - ``-v`` / ``--verbose`` makes the output of the program more noisy. This cannot be combined with ``-q``
 - ``-q`` / ``--quiet`` greatly reduces the output of the program. This cannot be combined with ``-v``
 
@@ -78,19 +78,19 @@ python -m gitautobackup "./repo" -m "automatic backup after big change"
 
 ## Module Interface
 
-This module can also be interfaced with as a normal module. The points of intreast include the ``main`` function for interfacing with this just like it was the command line (this means **parsing the arguments**, meaning that the features outlined in the Command Line Interface section above), and the ``auto_git_backup`` command for a more direct ussage of the command.
-While both can manage to acheave the same result its suggested to use ``auto_git_backup`` unless there is a specific reason to use ``main``.
+This module can also be interfaced with as a normal module. The points of intreast include the ``main`` function for interfacing with this just like it was the command line (this means **parsing the arguments**, meaning that the features outlined in the Command Line Interface section above), and the ``main_cli`` command for a more direct ussage of the command.
+While both can manage to acheave the same result its suggested to use ``main_cli`` unless there is a specific reason to use ``main``.
 
 More information about this module can be found in the main file as all functions have been documented in there.
 
 ### Module Example
 
 ```python:
-from gitautobackup import auto_git_backup
+from gitautobackup import main_cli
 
 myrepopath = "./project/repo/" #this assumes the folder "./project/repo/" has a already initialised non bare git repository already.
 
-if auto_git_backup(myrepopath, commit_message = "Automatic Backup No. 1", force_commit = True):
+if main_cli(myrepopath, commit_message = "Automatic Backup No. 1", force_commit = True):
   print("Backup successful")
 else:
   print("Backup failure")
@@ -102,7 +102,7 @@ This is licenced under the Mozilla Public License 2.0 (MPL 2.0) Licence. See the
 
 ## Credits
 
-This project uses the ``pathlib``, ``GitPython`` and optionally ``argparse`` modules, all very usefull python modules. Check them out if you want to make a simple CLI script like this, or for whatever else you might be up to in python. Also thank you to the developers of these modules for making these as they helped keep my sanity in check.
+This project uses the ``pathlib`` (or alternatively ``pathlib2`` if ``pathlib2`` is available to import and ``pathlib`` is not), ``GitPython`` and optionally ``argparse`` modules, all very usefull python modules. Check them out if you want to make a simple CLI script like this, or for whatever else you might be up to in python. Also thank you to the developers of these modules for making these as they helped keep my sanity in check.
 
 While not required, feel free to credit "*Markus Hammer*" (or just "*Markus*") if you find this code or script usefull for whatever you may be doing with it.
 
