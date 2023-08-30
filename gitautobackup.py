@@ -14,7 +14,7 @@
     https://github.com/MarkusHammer/gitautobackup
 '''
 
-__version__ = "2.0.0.1"
+__version__ = "2.0.1.0"
 
 from git import Repo, InvalidGitRepositoryError, GitCommandNotFound, NoSuchPathError, RepositoryDirtyError, GitError
 
@@ -48,6 +48,12 @@ except ImportError:
     END_IMPORTED = False
 
 try:
+    from os import name as os_type
+    OS_TYPE_IMPORTED = True
+except ImportError:
+    OS_TYPE_IMPORTED = False
+
+try:
     from typing import Union
 except ImportError:
     from typing_extensions import Union
@@ -78,14 +84,29 @@ class InvalidArchiveFormatError(GitError, Exception):
             repo_reference (Union[Repo, None], optional): A optional list of possible valid formats, or None if this cant be given.
         """
 
-        self.given_format = given_format
-        self.possible_formats = []
+        self.given_format:str = given_format
+        self.possible_formats:List[str] = []
 
         if possible_formats is not None:
             self.possible_formats = possible_formats
 
     def __str__(self) -> str:
         return f"The format {self.given_format} is not a valid format for a archive in git. {('Valid formats are ' + ' '.join(self.possible_formats)) if len(self.possible_formats) > 0 else ''}"
+
+
+class InsecureRepositoryError(GitError, Exception):
+    """Raised when a repository may be consitered insecure due to relevant GitPython security issues"""    
+
+    def __init__(self, reasoning:str = ""):
+        """
+        Args:
+            reasoning (str): The reason why this repo is consitered insecure, worded like "This repository is conidered insecure because {INSERT REASON HERE}."
+        """
+
+        self.reasoning:str = reasoning.strip()
+
+    def __str__(self) -> str:
+        return f"This path to a repository cannot be used and is considered insecure because {self.reasoning}."
 
 
 def path_hunt_dir(path: Union[Path, str, None]) -> Union['Path', None]:
@@ -165,8 +186,15 @@ def assert_repo(path: Union[Path, str, None], allow_bare: bool = False):
     if not path.exists():
         raise NoSuchPathError()
 
-    if not (path.is_dir() or str(path).endswith(".git")):
+    if not path.is_dir():
         raise InvalidGitRepositoryError()
+
+    if not OS_TYPE_IMPORTED or os_type == "nt": #protects against https://github.com/MarkusHammer/gitautobackup/security/dependabot/1
+        dangerous_files = list(path.glob('git.exe')) + list(path.glob('git'))
+        dangerous_files = [file for file in dangerous_files if not file.is_dir()]
+        if len(dangerous_files) > 0:
+            dangerous_files = [f"'{file.name}'" for file in dangerous_files]
+            raise InsecureRepositoryError(f"it contains {'files' if len(dangerous_files) > 1 else 'a file'} named {' and '.join(dangerous_files)} which may allow for this file to be called instead of the git command on your system")
 
     with Repo(path) as repo:
         if (not allow_bare) and repo.bare:
@@ -187,7 +215,7 @@ def is_repo(path: Union[Path, str, None], allow_bare: bool = False) -> bool:
     retval = True
     try:
         assert_repo(path, allow_bare)
-    except (InvalidGitRepositoryError, NoSuchPathError, PermissionError):
+    except (InvalidGitRepositoryError, NoSuchPathError, PermissionError): #DO NOT CATCH ANY InsecureRepositoryErrors these errors must be passed on!
         retval = False
     return retval
 
@@ -636,16 +664,19 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
         further_guess_paths = False
 
         next_is_message = False
+        next_is_path = False
         for arglet in args:
             arglet = arglet.strip().strip('"')
 
-            if next_is_message:
+            if next_is_path:
+                path = arglet.strip("'").strip('"')
+                next_is_path = False
+
+            elif next_is_message:
                 commit_message = arglet
+                next_is_message = False
 
-            if arglet.lower() == "-p" or arglet.lower() == "--path":
-                continue
-
-            if arglet.lower() == "-h" or arglet.lower() == "--help":
+            elif arglet.lower() == "-h" or arglet.lower() == "--help":
                 print(f"You are running {prog_arg[0]}")
                 print(
                     """
@@ -655,11 +686,11 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
                     To receve a better command line experience please install 'argparse' to your python environment!""")
                 return 0
 
-            if arglet.lower() == "-m" or arglet.lower() == "--message":
-                next_is_message = True
+            elif arglet.lower() == "-p" or arglet.lower() == "--path":
+                next_is_path = True
 
-            if path is not None and is_repo(arglet):
-                path = arglet.strip("'").strip('"')
+            elif arglet.lower() == "-m" or arglet.lower() == "--message":
+                next_is_message = True
 
         if path is None:
             print("No valid repository path was found")

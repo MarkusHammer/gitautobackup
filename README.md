@@ -6,7 +6,7 @@ A basic CLI program and python module that allows for quickly making and comming
 
 First off, this script uses the ``GitPython`` module, so ensure that you have a compatable version of git installed on you system so that ``GitPython`` can interface with it properly. For more info look [here](https://github.com/gitpython-developers/GitPython).
 
-If not installed via pip, than the requirements for this script must be installed in the python environment. This script requires the ``git`` python module be available in you python environment in order to run. This can also use the ``argparse`` module optionally to help greatly increase the usability on the command line (and is highly suggested), as well as the ``pprint`` module for better formating of verbose outputs. These can be installed using:
+If not installed via pip, than the requirements for this script must be installed in the python environment. This script requires the ``git`` python module be available in you python environment in order to run. This can also use the ``argparse`` module optionally to help greatly increase the usability on the command line (and is highly suggested). These can be installed using:
 
 ``pip install gitautobackup[cli]``
 
@@ -23,8 +23,6 @@ If you prefer to have this as a standalone file and are **sure** that you have a
 Depending on how you set up this file on your system, you can run this module using ``python -m gitautobackup`` if you set it up using pip, or ``python ./gitautobackup.py`` or ``py ./gitautobackup.py`` if you have the gitautobackup file locally.
 
 While this module does not explicitly require the ``argparse`` module, it is **highly** suggested as it help greatly improve the usability and allows acess to more options. If in doubt just install ``argparse`` if you can.
-
-Unlike argparse, ``pprint`` is a purley aesthetic module which is not at all needed other than for more friendly formating of the output of large blocks of text (something only commonly seen when using verbose output).
 
 ### With ``argparse``
 
@@ -56,11 +54,7 @@ There are also the traditional arguments that report various information about t
 
 ### Without ``argparse``
 
-While using this on the command line without ``argparse`` is not suggested, you may still access a diminished selection of features:
-
-- The ``-m`` or ``--message`` flag still works
-- The path of the git repository does not require a flag and can simply have it path stated. If multiple paths are given, the first one thats a valid repository will be chosen. The program will explicitly fail if none where given.
-- The ``--help`` and ``-h`` args also work as expected.
+While using this on the command line without ``argparse`` is not suggested, you may still access a diminished selection of features: only the ``-m``, ``--message``, ``-p``, ``--path``, ``--help`` and ``-h`` flags work.
 
 ### Command Line Interface Example
 
@@ -73,7 +67,7 @@ python -m gitautobackup -p "./repo" -m "automatic backup after big change" -f -f
 If ``argparse`` is not available:
 
 ```bash:
-python -m gitautobackup "./repo" -m "automatic backup after big change"
+python -m gitautobackup -p "./repo" -m "automatic backup after big change"
 ```
 
 ## Module Interface

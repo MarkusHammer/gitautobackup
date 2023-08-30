@@ -63,8 +63,8 @@
         readme = {file = ["README.md", "LICENSE"], content-type = "text/markdown"}
 
 [tool.pylint."MESSAGES CONTROL"]
-    disable = "C0301, C0415"
-    # Disables the warnings for importing out of the top level and long lines
+    disable = "C0415"
+    # Disables the warnings for long lines
 
 ### NOTE THIS MUST BE BUILT ON A VERSION OF PYTHON >= 3.10, 3.9.1 and 3.8.7 #THX https://github.com/pypa/build/issues/255#issuecomment-794560752
 ### py -3.10 -m pip install pip-tools validate-pyproject[all] build twine setuptools
