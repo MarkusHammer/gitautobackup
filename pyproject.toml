@@ -9,7 +9,7 @@
     description = "A basic CLI program and python module that allows for quickly making and comming changes to a git repository, along with a few other tools"
     authors = [{ name = "Markus Hammer", email = "107761433+MarkusHammer@users.noreply.github.com" }]
     license = { file = "LICENSE" }
-    dependencies = ["pathlib", "GitPython", "typing-extensions;python_version<'3.8'"]
+    dependencies = ["pathlib", "GitPython>=3.1.35", "typing-extensions;python_version<'3.8'"]
     requires-python = ">=3.0"
     classifiers = [
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
@@ -71,4 +71,4 @@
 ### validate-pyproject pyproject.toml
 ### pip-compile --resolver=backtracking pyproject.toml
 ### py -3.10 -m build
-### twine upload dist/* --verbose
+### py -3.10 -m twine upload dist/* --verbose

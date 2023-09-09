@@ -14,14 +14,20 @@
     https://github.com/MarkusHammer/gitautobackup
 '''
 
-__version__ = "2.0.1.0"
+__version__ = "2.0.1.1"
 
-from git import Repo, InvalidGitRepositoryError, GitCommandNotFound, NoSuchPathError, RepositoryDirtyError, GitError
+try:
+    from git import Repo, InvalidGitRepositoryError, GitCommandNotFound, NoSuchPathError, RepositoryDirtyError, GitError
+except ImportError:
+    print("GitPython, a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
 
 try:
     from pathlib import Path
 except ImportError:
-    from pathlib2 import Path
+    try:
+        from pathlib2 import Path
+    except ImportError:
+        print("pathlib (nor its backport: pathlib 2), a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
 
 try:
     from datetime import datetime
@@ -523,16 +529,19 @@ def main_cli(repo_path: Union[Path, str, None] = None,
     with repo:
 
         if force_commit or repo.is_dirty(untracked_files=True):
-            print("Commit...")
+            if verbose:
+                print("Commit...")
             made_a_backup = True
             commit_repo(repo, commit_message, force_commit, tag, force_tag, tag_message, verbose=verbose)
 
         if force_cleanup is None or force_cleanup is True:
-            print("Cleanup...")
+            if verbose:
+                print("Cleanup...")
             cleanup_repo(repo, force_cleanup, cleanup_aggressive, verbose=verbose)
 
         if archive_paths is not None:
-            print("Archive...")
+            if verbose:
+                print("Archive...")
             archive_repo(repo, archive_paths, archive_format, verbose=verbose)
 
     return made_a_backup
@@ -624,7 +633,8 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
                             action='version', version="https://github.com/MarkusHammer/gitautobackup",
                             help="Give a link to the github repo page")
 
-        args = parser.parse_args(*args)
+
+        args = parser.parse_args(args)
         path = args.repo_path
         if path is not None:
             path = path.strip("'").strip('"')
@@ -697,7 +707,7 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
             return False
         verbose = True
 
-    if args.verbose:
+    if verbose:
         print("Making auto backup")
 
     return main_cli(path, commit_message=commit_message, further_guess_paths=further_guess_paths, force_commit=force_commit, tag = tag, tag_message = tag_message, force_tag = force_tag, force_cleanup=force_cleanup, cleanup_aggressive = cleanup_aggressive, archive_paths = archive_path, archive_format = archive_format, verbose=verbose)
@@ -706,24 +716,28 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
 if CLIARGV_IMPORTED and END_IMPORTED: #this is the only way the CLI could be run
     def __main__():
         """PRIVATE USED TO RUN DIRECTLY FORM THE COMMAND LINE DO NOT USE THIS IF USING THIS AS A MODULE"""
-        scode = -1
+        exitcode = -1 #while this is the default error code, -1 is also always used for an unknown error
         try:
-            scode = 0 if main(cliargv[1:], prog_arg=cliargv[0]) else 1 #1 means not error but also no changes, 0 is no error and changes where made
+            exitcode = 0 if main(*tuple(cliargv[1:]), prog_arg=cliargv[0]) else 1 #1 means no error but also no changes, 0 is no error and changes where made
         except GitCommandNotFound:
             print("Your system is not set up properly for use with the GitPython module. Please refer to it's documentation for setting it up before running this script.")
-            scode = -2
+            exitcode = -2
         except (NoSuchPathError, FileNotFoundError, PermissionError):
             print("The given path does not exist on this system or could not be accessed by this user.")
-            scode = -3
+            exitcode = -3
         except InvalidGitRepositoryError:
             print("The folder given is not a git repo, or is bare.")
-            scode = -4
+            exitcode = -4
         except RepositoryDirtyError:
             print("The repository already has some changes that could end up being overwritten. Please Handle these first before running this.")
-            scode = -5
+            exitcode = -5
         except InvalidArchiveFormatError as exc:
             print(str(exc))
-            scode = -6
-        end(scode)
+            exitcode = -6
+        except Exception as exc: #for any other exceptions
+            print(f"An unknown error has occurred, It's the following:\n{repr(exc)}\n{exc}")
+            exitcode = -1 #The error code always used for an unknown error
+        end(exitcode)
+    
     if __name__ == "__main__":
         __main__()
