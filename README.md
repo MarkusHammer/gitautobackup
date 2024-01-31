@@ -1,12 +1,14 @@
 # Git Auto Backup
 
-A basic CLI program and python module that allows for quickly making and comming changes to a git repository, along with a few other tools. Use it from the command line or import it as a module, it works both ways!
+A basic CLI program and python module that allows for quickly making and committing changes to a git repository, along with a few other tools. Use it from the command line or import it as a module, it works both ways!
+
+[![CodeQL](https://github.com/MarkusHammer/gitautobackup/actions/workflows/codeql.yml/badge.svg)](https://github.com/MarkusHammer/gitautobackup/actions/workflows/codeql.yml)
 
 ## Setup
 
-First off, this script uses the ``GitPython`` module, so ensure that you have a compatable version of git installed on you system so that ``GitPython`` can interface with it properly. For more info look [here](https://github.com/gitpython-developers/GitPython).
+First off, this script uses the ``GitPython`` module, so ensure that you have a compatible version of git installed on your system so that ``GitPython`` can interface with it properly. For more info look [here](https://github.com/gitpython-developers/GitPython).
 
-If not installed via pip, than the requirements for this script must be installed in the python environment. This script requires the ``git`` python module be available in you python environment in order to run. This can also use the ``argparse`` module optionally to help greatly increase the usability on the command line (and is highly suggested). These can be installed using:
+If not installed via pip, then the requirements for this script must be installed in the python environment. This script requires the ``git`` python module to be available in your python environment in order to run. This can also use the ``argparse`` module optionally to help greatly increase the usability on the command line (and is highly suggested). These can be installed using:
 
 ``pip install gitautobackup[cli]``
 
@@ -22,35 +24,35 @@ If you prefer to have this as a standalone file and are **sure** that you have a
 
 Depending on how you set up this file on your system, you can run this module using ``python -m gitautobackup`` if you set it up using pip, or ``python ./gitautobackup.py`` or ``py ./gitautobackup.py`` if you have the gitautobackup file locally.
 
-While this module does not explicitly require the ``argparse`` module, it is **highly** suggested as it help greatly improve the usability and allows acess to more options. If in doubt just install ``argparse`` if you can.
+While this module does not explicitly require the ``argparse`` module, it is **highly** suggested as it help greatly improve the usability and allows access to more options. If in doubt just install ``argparse`` if you can.
 
 ### With ``argparse``
 
-This module does not have any required arguments, as everything does have a default behaviour. The most importnant thing to note is that when not supplied with the path of the git repository, it attempts to deduce the location of a git repository (by testing if the directory is able to be loaded as a git repository) from (in this specific order):
+This module does not have any required arguments, as everything does have a default behavior. The most important thing to note is that when not supplied with the path of the git repository, it attempts to deduce the location of a git repository (by testing if the directory is able to be loaded as a git repository) from (in this specific order):
 
-1. The console's current working direcory
+1. The console's current working directory
 2. The directory given in the 0th arg of the command line (aka ``sys.argv[0]``'s lowest directory)
 3. The location of this file itself
-   For those wanting to acess this logic when using this a  a module the ``get_default_git_location()`` function will return this value.
+   For those wanting to access this logic when using this as a module the ``get_default_git_location()`` function will return this value.
 
 Here are a few of the possible arguments to use:
 
 - ``-p`` / ``--path`` specifies the repository path
 - ``-m`` / ``--message`` specifies the commit's message.
 - ``-t`` / ``--tag`` sets a tag for the commit
-- ``-a`` / ``--archive`` / ``--archive_path`` sets a path for a archive file to be made. If this isn't used a archive file will not be made.
+- ``-a`` / ``--archive`` / ``--archive_path`` sets a path for an archive file to be made. If this isn't used an archive file will not be made.
 - ``-f`` / ``--force`` / ``--force_commit`` makes a commit be made even if nothing was changed
-- ``--fc`` / ``--force_cleanup`` forces the repository's database to always be cleaned, even if its not really necessary. This cannot be combined with ``--fnc`` or ``--fca``
+- ``--fc`` / ``--force_cleanup`` forces the repository's database to always be cleaned, even if it's not really necessary. This cannot be combined with ``--fnc`` or ``--fca``
 - ``--fnc`` / ``--force_no_cleanup`` forces the repository's database to never be cleaned, even if it might be beneficial. This cannot be combined with ``--fc`` or ``--fca``
-- ``--fca`` / ``--force_cleanup_aggressive`` forces the repository's database cleaned aggressively (taking a much longer time), even if its not necessary. This cannot be combined with ``--fc`` or ``--fnc``
+- ``--fca`` / ``--force_cleanup_aggressive`` forces the repository's database cleaned aggressively (taking a much longer time), even if it's not necessary. This cannot be combined with ``--fc`` or ``--fnc``
 - ``-v`` / ``--verbose`` makes the output of the program more noisy. This cannot be combined with ``-q``
 - ``-q`` / ``--quiet`` greatly reduces the output of the program. This cannot be combined with ``-v``
 
-There are also the traditional arguments that report various information about this software then exit:
+There are also the traditional arguments that report various information about this software and then exit:
 
-- ``--ver`` / ``--version`` prints the program version and then exits. You don't need a input file if you run this command.
+- ``--ver`` / ``--version`` prints the program version and then exits. You don't need an input file if you run this command.
 - ``-h`` / ``--help`` prints some details about the programs arguments and then exits. You don't need a input file if you run this command.
-- ``--git`` / ``--github`` prints a like to the github repository and then exits. You don't need a input file if you run this command.
+- ``--git`` / ``--github`` prints a link to the github repository and then exits. You don't need an input file if you run this command.
 
 ### Without ``argparse``
 
@@ -72,8 +74,8 @@ python -m gitautobackup -p "./repo" -m "automatic backup after big change"
 
 ## Module Interface
 
-This module can also be interfaced with as a normal module. The points of intreast include the ``main`` function for interfacing with this just like it was the command line (this means **parsing the arguments**, meaning that the features outlined in the Command Line Interface section above), and the ``main_cli`` command for a more direct usage of the command.
-While both can manage to acheave the same result its suggested to use ``main_cli`` unless there is a specific reason to use ``main``.
+This module can also be interfaced with as a normal module. The points of interest include the ``main`` function for interfacing with this just like it was the command line (this means **parsing the arguments**, meaning that the features outlined in the Command Line Interface section above), and the ``main_cli`` command for a more direct usage of the command.
+While both can manage to achieve the same result it's suggested to use ``main_cli`` unless there is a specific reason to use ``main``.
 
 More information about this module can be found in the main file as all functions have been documented within.
 
@@ -92,12 +94,12 @@ else:
 
 ## Licence
 
-This is licenced under the Mozilla Public License 2.0 (MPL 2.0) Licence. See the ``Licence`` file in this repository for more information.
+This is licensed under the Mozilla Public License 2.0 (MPL 2.0) Licence. See the ``Licence`` file in this repository for more information.
 
 ## Credits
 
-This project uses the ``pathlib`` (or alternatively ``pathlib2`` if ``pathlib2`` is available to import and ``pathlib`` is not), ``GitPython`` and optionally ``argparse`` modules, all very usefull python modules. Check them out if you want to make a simple CLI script like this, or for whatever else you might be up to in python. Also thank you to the developers of these modules for making these as they helped keep my sanity in check.
+This project uses the ``pathlib`` (or alternatively ``pathlib2`` if ``pathlib2`` is available to import and ``pathlib`` is not), ``GitPython`` and optionally ``argparse`` modules, all very useful python modules. Check them out if you want to make a simple CLI script like this, or for whatever else you might be up to in python. Also thank you to the developers of these modules for making these as they helped keep my sanity in check.
 
-While not required, feel free to credit "*Markus Hammer*" (or just "*Markus*") if you find this code or script usefull for whatever you may be doing with it.
+While not required, feel free to credit "*Markus Hammer*" (or just "*Markus*") if you find this code or script useful for whatever you may be doing with it.
 
 **Thanks!**
