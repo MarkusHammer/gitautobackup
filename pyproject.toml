@@ -5,12 +5,11 @@
 [project]
     dynamic = ["version", "readme"]
     name = "gitautobackup"
-    #fullname = "Git Auto Backup Tool"
     description = "A basic CLI program and python module that allows for quickly making and comming changes to a git repository, along with a few other tools"
     authors = [{ name = "Markus Hammer", email = "107761433+MarkusHammer@users.noreply.github.com" }]
     license = { file = "LICENSE" }
-    dependencies = ["pathlib", "GitPython>=3.1.35", "typing-extensions;python_version<'3.8'"]
-    requires-python = ">=3.0"
+    dependencies = ["pathlib", "GitPython>=3.1.41", "typing-extensions;python_version<'3.8'"]
+    requires-python = ">=3"
     classifiers = [
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
         "Development Status :: 5 - Production/Stable",
@@ -60,15 +59,13 @@
     zip-safe = true
     [tool.setuptools.dynamic]
         version = {attr = "gitautobackup.__version__"}
-        readme = {file = ["README.md", "LICENSE"], content-type = "text/markdown"}
+        readme = {file = ["README.md", "SECURITY.md", "LICENSE"], content-type = "text/markdown"}
 
-[tool.pylint."MESSAGES CONTROL"]
-    disable = "C0415"
-    # Disables the warnings for long lines
-
-### NOTE THIS MUST BE BUILT ON A VERSION OF PYTHON >= 3.10, 3.9.1 and 3.8.7 #THX https://github.com/pypa/build/issues/255#issuecomment-794560752
+### NOTE THIS MUST BE BUILT USING A VERSION OF PYTHON >= 3.10, 3.9.1 and 3.8.7 #THX https://github.com/pypa/build/issues/255#issuecomment-794560752
+### below are the commands used on windows
 ### py -3.10 -m pip install pip-tools validate-pyproject[all] build twine setuptools
 ### validate-pyproject pyproject.toml
-### pip-compile --resolver=backtracking pyproject.toml
+### pip-compile --resolver=backtracking --no-header --upgrade --rebuild pyproject.toml
 ### py -3.10 -m build
-### py -3.10 -m twine upload dist/* --verbose
+### py -3.10 -m twine check dist/*
+### py -3.10 -m twine upload dist/* --verbose --username __token__

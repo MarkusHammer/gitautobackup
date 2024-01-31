@@ -1,4 +1,4 @@
-# Git Auto Backup Tool
+# Git Auto Backup
 
 A basic CLI program and python module that allows for quickly making and comming changes to a git repository, along with a few other tools. Use it from the command line or import it as a module, it works both ways!
 
@@ -16,7 +16,7 @@ or if you just want the module without the extra cli overhead (not suggested):
 
 If you prefer to have this as a standalone file and are **sure** that you have all dependences satisfied in some way you can also simply clone this repo into your project and import the ``gitautobackup.py`` file locally.
 
-> Please note that if this is the method you use to ensure that the path is specified as if not it will default to the current terminal working directory which if set to the location of the clone of this repository will result in making a commit to this project's clone. I only say this as this is a mistake I have made myself quite a few times.
+> Please note that if this is the method you use, please ensure that the path is always specified, as if not it will default to the current terminal working directory, which if set to the location of your clone of this repository will result in making a commit to this project's clone. I only mention this as this is a mistake I have made myself quite a few times.
 
 ## Command Line Interface
 
@@ -72,10 +72,10 @@ python -m gitautobackup -p "./repo" -m "automatic backup after big change"
 
 ## Module Interface
 
-This module can also be interfaced with as a normal module. The points of intreast include the ``main`` function for interfacing with this just like it was the command line (this means **parsing the arguments**, meaning that the features outlined in the Command Line Interface section above), and the ``main_cli`` command for a more direct ussage of the command.
+This module can also be interfaced with as a normal module. The points of intreast include the ``main`` function for interfacing with this just like it was the command line (this means **parsing the arguments**, meaning that the features outlined in the Command Line Interface section above), and the ``main_cli`` command for a more direct usage of the command.
 While both can manage to acheave the same result its suggested to use ``main_cli`` unless there is a specific reason to use ``main``.
 
-More information about this module can be found in the main file as all functions have been documented in there.
+More information about this module can be found in the main file as all functions have been documented within.
 
 ### Module Example
 

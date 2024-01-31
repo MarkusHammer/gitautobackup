@@ -1,6 +1,6 @@
 # Security Policy
 
-While the python source code will be actively maintained, any binary files are in no way supported.
+While the python source code will be actively maintained, any binary files (if at all provided) are in no way supported.
 These are provided as a courtesy and are not intended to be the main usage of this software.
 Please keep this in mind when choosing how you wish to use this software.
 
@@ -8,8 +8,8 @@ Please keep this in mind when choosing how you wish to use this software.
 
 | Version    | Supported |
 | ---------- | --------- |
-| 2.0.1.0 >= | ✅        |
-| 2.0.0.1 <  | ❌        |
+| 2.0.1.2 >= | ✅        |
+| 2.0.1.1 < | ❌        |
 
 ## Reporting a Vulnerability
 

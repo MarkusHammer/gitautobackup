@@ -14,20 +14,42 @@
     https://github.com/MarkusHammer/gitautobackup
 '''
 
-__version__ = "2.0.1.1"
+__version__ = "2.0.1.2"
 
 try:
     from git import Repo, InvalidGitRepositoryError, GitCommandNotFound, NoSuchPathError, RepositoryDirtyError, GitError
-except ImportError:
-    print("GitPython, a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
+except ImportError as err:
+    print("'GitPython', a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
+    raise err
 
 try:
     from pathlib import Path
-except ImportError:
+except ImportError as err:
     try:
         from pathlib2 import Path
     except ImportError:
-        print("pathlib (nor its backport: pathlib 2), a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
+        print("'pathlib' (nor its backport: 'pathlib2'), a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
+        raise err
+
+try:
+    from typing import Union
+except ImportError:
+    from typing_extensions import Union
+
+try:
+    from typing import List
+except ImportError:
+    from typing_extensions import List
+
+try:
+    from typing import Tuple
+except ImportError:
+    from typing_extensions import Tuple
+
+try:
+    from typing import Callable
+except ImportError:
+    from typing_extensions import Callable
 
 try:
     from datetime import datetime
@@ -53,32 +75,6 @@ try:
 except ImportError:
     END_IMPORTED = False
 
-try:
-    from os import name as os_type
-    OS_TYPE_IMPORTED = True
-except ImportError:
-    OS_TYPE_IMPORTED = False
-
-try:
-    from typing import Union
-except ImportError:
-    from typing_extensions import Union
-
-try:
-    from typing import List
-except ImportError:
-    from typing_extensions import List
-
-try:
-    from typing import Tuple
-except ImportError:
-    from typing_extensions import Tuple
-
-try:
-    from typing import Callable
-except ImportError:
-    from typing_extensions import Callable
-
 
 class InvalidArchiveFormatError(GitError, Exception):
     """Raised when a format for git archive when that format is not a valid format for git archive"""    
@@ -98,21 +94,6 @@ class InvalidArchiveFormatError(GitError, Exception):
 
     def __str__(self) -> str:
         return f"The format {self.given_format} is not a valid format for a archive in git. {('Valid formats are ' + ' '.join(self.possible_formats)) if len(self.possible_formats) > 0 else ''}"
-
-
-class InsecureRepositoryError(GitError, Exception):
-    """Raised when a repository may be consitered insecure due to relevant GitPython security issues"""    
-
-    def __init__(self, reasoning:str = ""):
-        """
-        Args:
-            reasoning (str): The reason why this repo is consitered insecure, worded like "This repository is conidered insecure because {INSERT REASON HERE}."
-        """
-
-        self.reasoning:str = reasoning.strip()
-
-    def __str__(self) -> str:
-        return f"This path to a repository cannot be used and is considered insecure because {self.reasoning}."
 
 
 def path_hunt_dir(path: Union[Path, str, None]) -> Union['Path', None]:
@@ -194,13 +175,6 @@ def assert_repo(path: Union[Path, str, None], allow_bare: bool = False):
 
     if not path.is_dir():
         raise InvalidGitRepositoryError()
-
-    if not OS_TYPE_IMPORTED or os_type == "nt": #protects against https://github.com/MarkusHammer/gitautobackup/security/dependabot/1
-        dangerous_files = list(path.glob('git.exe')) + list(path.glob('git'))
-        dangerous_files = [file for file in dangerous_files if not file.is_dir()]
-        if len(dangerous_files) > 0:
-            dangerous_files = [f"'{file.name}'" for file in dangerous_files]
-            raise InsecureRepositoryError(f"it contains {'files' if len(dangerous_files) > 1 else 'a file'} named {' and '.join(dangerous_files)} which may allow for this file to be called instead of the git command on your system")
 
     with Repo(path) as repo:
         if (not allow_bare) and repo.bare:
@@ -605,7 +579,7 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
                             help='Push a commit to the repo even if there are no changes')
         parser.add_argument('--ft', '--force_tag',
                             dest='force_tag', action='store_true', default=force_tag,
-                            help='If a tag is to be made, force it to overwrite any existing tags that may be in it`s way')
+                            help='If a tag is to be made, force it to overwrite any existing tags that may be in its way')
 
         force_cleanup_group = parser.add_mutually_exclusive_group()
         force_cleanup_group.add_argument('--fnc', '--force_no_cleanup',
