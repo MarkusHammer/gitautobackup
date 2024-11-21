@@ -2,7 +2,7 @@
 
 A basic CLI program and python module that allows for quickly making and committing changes to a git repository, along with a few other tools. Use it from the command line or import it as a module, it works both ways!
 
-[![CodeQL](https://github.com/MarkusHammer/gitautobackup/actions/workflows/codeql.yml/badge.svg)](https://github.com/MarkusHammer/gitautobackup/actions/workflows/codeql.yml)
+[![CodeQL](https://github.com/MarkusHammer/gitautobackup/actions/workflows/codeql.yml/badge.svg)](https://github.com/MarkusHammer/gitautobackup/actions/workflows/codeql.yml) [![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/markushammer)
 
 ## Setup
 
