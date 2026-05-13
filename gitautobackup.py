@@ -708,9 +708,15 @@ if CLIARGV_IMPORTED and END_IMPORTED: #this is the only way the CLI could be run
         except InvalidArchiveFormatError as exc:
             print(str(exc))
             exitcode = -6
-        except Exception as exc: #for any other exceptions
-            print(f"An unknown error has occurred, It's the following:\n{repr(exc)}\n{exc}")
-            exitcode = -1 #The error code always used for an unknown error
+        except KeyboardInterrupt:
+            exitcode = -7
+        except SystemExit as sys_ex:
+            print(f"System exit error encountered. Exiting with code {sys_ex.code}.")
+            exitcode = sys_ex.code
+        except BaseException as exc:  # pylint:disable=broad-exception-caught
+            # Any other exceptions
+            print(f"An unknown error has occurred:\n{repr(exc)}\n{exc}")
+            exitcode = -1  # The error code always used for an unknown error
         end(exitcode)
     
     if __name__ == "__main__":
