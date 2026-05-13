@@ -8,11 +8,7 @@ A basic CLI program and python module that allows for quickly making and committ
 
 First off, this script uses the ``GitPython`` module, so ensure that you have a compatible version of git installed on your system so that ``GitPython`` can interface with it properly. For more info look [here](https://github.com/gitpython-developers/GitPython).
 
-If not installed via pip, then the requirements for this script must be installed in the python environment. This script requires the ``git`` python module to be available in your python environment in order to run. This can also use the ``argparse`` module optionally to help greatly increase the usability on the command line (and is highly suggested). These can be installed using:
-
-``pip install gitautobackup[cli]``
-
-or if you just want the module without the extra cli overhead (not suggested):
+If not installed via pip, then the requirements for this script must be installed in the python environment. This script requires the ``git`` python module to be available in your python environment in order to run. To install both this script and the necessary dependencies (excluding `argparse`, as it's typically builtin), run:
 
 ``pip install gitautobackup``
 
@@ -24,7 +20,7 @@ If you prefer to have this as a standalone file and are **sure** that you have a
 
 Depending on how you set up this file on your system, you can run this module using ``python -m gitautobackup`` if you set it up using pip, or ``python ./gitautobackup.py`` or ``py ./gitautobackup.py`` if you have the gitautobackup file locally.
 
-While this module does not explicitly require the ``argparse`` module, it is **highly** suggested as it help greatly improve the usability and allows access to more options. If in doubt just install ``argparse`` if you can.
+While this module does not explicitly require the ``argparse`` module, it is **highly** suggested as it help greatly improve the usability and allows access to more options. This module is usually builtin for most modern python distributions, though it can also be installed via `pip` if not.
 
 ### With ``argparse``
 

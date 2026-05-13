@@ -39,7 +39,6 @@
         "utility"
     ]
     [project.optional-dependencies]
-        cli = ["argparse"]
         dev = ["setuptools>=64.0.0", "pip-tools", "validate-pyproject[all]", "build", "twine"]
     [project.scripts] 
         gitautobackup = "gitautobackup:__main__"

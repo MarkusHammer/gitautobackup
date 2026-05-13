@@ -24,12 +24,12 @@ except ImportError as err:
 
 try:
     from pathlib import Path
-except ImportError as err:
+except ImportError as native_err:
     try:
         from pathlib2 import Path
-    except ImportError:
+    except ImportError as backport_err:
         print("'pathlib' (nor its backport: 'pathlib2'), a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
-        raise err
+        raise native_err from backport_err
 
 try:
     from typing import Union
@@ -109,8 +109,7 @@ def path_hunt_dir(path: Union[Path, str, None]) -> Union['Path', None]:
     if path is None:
         return None
 
-    if not isinstance(path, Path):
-        path = Path(path)
+    path = Path(path)
 
     if not path.exists():
         return None
@@ -139,8 +138,7 @@ def assert_file(path: Union[Path, str, None]):
     if path is None:
         raise NoSuchPathError()
 
-    if not isinstance(path, Path):
-        path = Path(path)
+    path = Path(path)
     path = path.expanduser()
 
     if not path.exists():
@@ -166,8 +164,7 @@ def assert_repo(path: Union[Path, str, None], allow_bare: bool = False):
     if path is None:
         raise NoSuchPathError()
 
-    if not isinstance(path, Path):
-        path = Path(path)
+    path = Path(path)
     path = path.expanduser()
 
     if not path.exists():
@@ -721,3 +718,5 @@ if CLIARGV_IMPORTED and END_IMPORTED: #this is the only way the CLI could be run
     
     if __name__ == "__main__":
         __main__()
+else:
+    raise ImportError
