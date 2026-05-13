@@ -53,27 +53,21 @@ except ImportError:
 
 try:
     from datetime import datetime
-    DATETIME_IMPORTED = True
 except ImportError:
-    DATETIME_IMPORTED = False
+    try:
+        from time import time
+        now_string = lambda: str(time())  # pylint:disable=unnecessary-lambda-assignment
+    except ImportError:
+        now_string = None
+else:
+    now_string = lambda: str(datetime.now())  # pylint:disable=unnecessary-lambda-assignment
 
 try:
-    from argparse import ArgumentParser
-    ARGPARSE_IMPORTED = True
+    from argparse import ArgumentParser as _ArgumentParser
+    ArgumentParser = _ArgumentParser
 except ImportError:
-    ARGPARSE_IMPORTED = False
+    ArgumentParser = None
 
-try:
-    from sys import argv as cliargv
-    CLIARGV_IMPORTED = True
-except ImportError:
-    CLIARGV_IMPORTED = False
-
-try:
-    from sys import exit as end
-    END_IMPORTED = True
-except ImportError:
-    END_IMPORTED = False
 
 
 class InvalidArchiveFormatError(GitError, Exception):
@@ -197,18 +191,18 @@ def is_repo(path: Union[Path, str, None], allow_bare: bool = False) -> bool:
     return retval
 
 
-def default_commit_name(nodatetime: bool = False) -> str:
+def default_commit_name(no_datetime: bool = False) -> str:
     """Returns the default commit name, generated based on if the system has the datetime module accessible and if its allowed.
 
     Args:
-        nodatetime (bool, optional): Don't allow use fo the datetime module. Defaults to False.
+        no_datetime (bool, optional): Don't allow use fo the datetime module. Defaults to False.
 
     Returns:
         str: The ideal default commit name.
     """
 
-    if DATETIME_IMPORTED and not nodatetime:
-        return f"Autosave on {datetime.now()}"
+    if not no_datetime and now_string is not None:
+        return f"Autosave on {now_string()}"
     return "Autosave"
 
 
@@ -219,15 +213,9 @@ def get_default_file_location() -> Union[Path, None]:
         Union[Path,None]: The path that was found, it one was found. If not this will be None.
     """
 
-    possiblepath = path_hunt_dir(Path.cwd())
-    if possiblepath is not None and possiblepath.exists():
-        return possiblepath
-
-    if CLIARGV_IMPORTED:
-        if len(cliargv) > 0 and isinstance(cliargv[0], str):
-            possiblepath = path_hunt_dir(cliargv[0])
-            if possiblepath is not None and possiblepath.exists():
-                return possiblepath
+    possible_path = path_hunt_dir(Path.cwd().expanduser().absolute())
+    if possible_path is not None and possible_path.exists():
+        return possible_path
 
     # this only really helps if this file is run as the main script.
     # Unlikely that it will be needed however because argv is almost always guaranteed
@@ -239,9 +227,9 @@ def get_default_file_location() -> Union[Path, None]:
         except (NameError, TypeError):
             pass
         else:
-            possiblepath = path_hunt_dir(__file__)
-            if possiblepath is not None and possiblepath.exists():
-                return possiblepath
+            possible_path = path_hunt_dir(__file__)
+            if possible_path is not None and possible_path.exists():
+                return possible_path
 
     return None
 
@@ -518,7 +506,7 @@ def main_cli(repo_path: Union[Path, str, None] = None,
     return made_a_backup
 
 
-def main(*args, prog_arg: Union[str, None] = None) -> bool:
+def main(*argv:str, prog_arg: Union[str, None] = None) -> bool:
     """A function that when used as a module acts as the main entry point of the program. This allows for you to use this as you would normally via the cli but still import this as a module.
     Please note however that argv is only intended for the cli arguments and not for the name of the script running this, thats what the optional prog_arg argument is intended for.
     Also note that this function does not handle exceptions unlike how the cli turns these into user friendly messages. This is intended as the user of a module will most likely find these exceptions useful.
@@ -545,7 +533,7 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
     archive_format = None
 
     # parse the cli args
-    if ARGPARSE_IMPORTED:
+    if ArgumentParser is not None:
         parser = ArgumentParser(prog=prog_arg,
                                 description="""
                                 A basic CLI program that allows for quick formatting of a .gitignore file
@@ -604,8 +592,7 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
                             action='version', version="https://github.com/MarkusHammer/gitautobackup",
                             help="Give a link to the github repo page")
 
-
-        args = parser.parse_args(args)
+        args = parser.parse_args(argv)
         path = args.repo_path
         if path is not None:
             path = path.strip("'").strip('"')
@@ -646,7 +633,7 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
 
         next_is_message = False
         next_is_path = False
-        for arglet in args:
+        for arglet in argv:
             arglet = arglet.strip().strip('"')
 
             if next_is_path:
@@ -658,14 +645,14 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
                 next_is_message = False
 
             elif arglet.lower() == "-h" or arglet.lower() == "--help":
-                print(f"You are running {prog_arg[0]}")
+                print(f"You are running {prog_arg}")
                 print(
                     """
                     -h or --help shows this
                     -m or --message specifies a message for the commit
                     All other arguments given will be tested for being a valid repository. The first one found will be the one selected.
                     To receive a better command line experience please install 'argparse' to your python environment!""")
-                return 0
+                return False
 
             elif arglet.lower() == "-p" or arglet.lower() == "--path":
                 next_is_path = True
@@ -684,8 +671,12 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
     return main_cli(path, commit_message=commit_message, further_guess_paths=further_guess_paths, force_commit=force_commit, tag = tag, tag_message = tag_message, force_tag = force_tag, force_cleanup=force_cleanup, cleanup_aggressive = cleanup_aggressive, archive_paths = archive_path, archive_format = archive_format, verbose=verbose)
 
 
-if CLIARGV_IMPORTED and END_IMPORTED: #this is the only way the CLI could be run
-    def __main__():
+if __name__ == "__main__":  # this is the only way the CLI could be run
+    # these are expected to be available for any python environment past 3.0
+    from sys import exit as end
+    from sys import argv as cliargv
+
+    def _main_entry():
         """PRIVATE USED TO RUN DIRECTLY FORM THE COMMAND LINE DO NOT USE THIS IF USING THIS AS A MODULE"""
         exitcode = -1 #while this is the default error code, -1 is also always used for an unknown error
         try:
@@ -715,8 +706,5 @@ if CLIARGV_IMPORTED and END_IMPORTED: #this is the only way the CLI could be run
             print(f"An unknown error has occurred:\n{repr(exc)}\n{exc}")
             exitcode = -1  # The error code always used for an unknown error
         end(exitcode)
-    
-    if __name__ == "__main__":
-        __main__()
-else:
-    raise ImportError
+
+    _main_entry()
