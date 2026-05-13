@@ -8,7 +8,7 @@
     description = "A basic CLI program and python module that allows for quickly making and comming changes to a git repository, along with a few other tools"
     authors = [{ name = "Markus Hammer", email = "107761433+MarkusHammer@users.noreply.github.com" }]
     license = { file = "LICENSE" }
-    dependencies = ["pathlib", "GitPython>=3.1.41", "typing-extensions;python_version<'3.8'"]
+    dependencies = ["GitPython>=3.1.50", "typing-extensions;python_version<'3.8'", "pathlib2;python_version<'3.0'"]
     requires-python = ">=3"
     classifiers = [
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
@@ -65,7 +65,6 @@
 ### below are the commands used on windows
 ### py -3.10 -m pip install pip-tools validate-pyproject[all] build twine setuptools
 ### validate-pyproject pyproject.toml
-### pip-compile --resolver=backtracking --no-header --upgrade --rebuild pyproject.toml
 ### py -3.10 -m build
 ### py -3.10 -m twine check dist/*
 ### py -3.10 -m twine upload dist/* --verbose --username __token__
