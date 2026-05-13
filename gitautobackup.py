@@ -97,8 +97,8 @@ class InvalidArchiveFormatError(GitError, Exception):
 
 
 def path_hunt_dir(path: Union[Path, str, None]) -> Union['Path', None]:
-    """Gets the parrent directory of a file if possible.
     
+    """Gets the parent directory of a file if possible.
     Args:
         path (Union[Path,str,None]): The path to search for the parent directory of. If this is set to None the return value will always also be None
 
@@ -201,7 +201,7 @@ def is_repo(path: Union[Path, str, None], allow_bare: bool = False) -> bool:
 
 
 def default_commit_name(nodatetime: bool = False) -> str:
-    """Returns the default commit name, generated based on if the system has the datetime module accessable and if its allowed.
+    """Returns the default commit name, generated based on if the system has the datetime module accessible and if its allowed.
 
     Args:
         nodatetime (bool, optional): Don't allow use fo the datetime module. Defaults to False.
@@ -216,7 +216,7 @@ def default_commit_name(nodatetime: bool = False) -> str:
 
 
 def get_default_file_location() -> Union[Path, None]:
-    """Returns the most relevant default file location based on how this script/module is run and what is accessable. Returns None if nothing could be determined.
+    """Returns the most relevant default file location based on how this script/module is run and what is accessible. Returns None if nothing could be determined.
 
     Returns:
         Union[Path,None]: The path that was found, it one was found. If not this will be None.
@@ -234,7 +234,7 @@ def get_default_file_location() -> Union[Path, None]:
 
     # this only really helps if this file is run as the main script.
     # Unlikely that it will be needed however because argv is almost always guaranteed
-    #   to work on any system that is able to suport the mandatory requirements of this script anyway.
+    #   to work on any system that is able to support the mandatory requirements of this script anyway.
     # Still good for a plan c however ...
     if __name__ == "__main__":
         try:
@@ -287,7 +287,7 @@ def print_output(msg:Union[str,None] = None, *, print_func:Callable = print):
 
     Args:
         msg (Union[str,None], optional): The message to print. Defaults to None.
-        print_func (Callable, optional): Overide the print function possibly called. Defaults to the callable of ```print()```.
+        print_func (Callable, optional): Override the print function possibly called. Defaults to the callable of ```print()```.
     """
     
     if msg is None:
@@ -475,10 +475,10 @@ def main_cli(repo_path: Union[Path, str, None] = None,
         force_tag (bool, optional): Create the new tag even if an old one already exists. No effect if tag is None.
         tag_message (Union[str,None], optional): Add a message to the tag, or None if the tag should have no message. No effect if tag is None.
 
-        force_cleanup (Union[bool, None], optional): Should (or shouldn't) the database be cleaned despite it possibly being beneficial. True forces the database to be cleaned, False forces the databest to not be cleaned, and None allows for this to be automatically determined by git instead. Defaults to None.
+        force_cleanup (Union[bool, None], optional): Should (or shouldn't) the database be cleaned despite it possibly being beneficial. True forces the database to be cleaned, False forces the database to not be cleaned, and None allows for this to be automatically determined by git instead. Defaults to None.
         cleanup_aggressive (bool, optional): If the repo is cleaned, should it be done aggressively?
 
-        archive_path (Union[Path,None], optional): If set to None no archive will be made, otherwide a archive will be output to the given location.
+        archive_path (Union[Path,None], optional): If set to None no archive will be made, otherwise a archive will be output to the given location.
         archive_format (Union[str, None], optional): If set this will override the format of the archive being outputted, if set to None it will be inferred form the path.
 
         verbose (bool, optional): Should this function print out non error related messages? Defaults to True.
@@ -524,7 +524,7 @@ def main_cli(repo_path: Union[Path, str, None] = None,
 def main(*args, prog_arg: Union[str, None] = None) -> bool:
     """A function that when used as a module acts as the main entry point of the program. This allows for you to use this as you would normally via the cli but still import this as a module.
     Please note however that argv is only intended for the cli arguments and not for the name of the script running this, thats what the optional prog_arg argument is intended for.
-    Also note that this function does not handle exceptions unlike how the cli turns these into user friendly messages. This is intended as the user of a module will most likely find these exceptions usefull.
+    Also note that this function does not handle exceptions unlike how the cli turns these into user friendly messages. This is intended as the user of a module will most likely find these exceptions useful.
 
     Args:
         *args (Tuple[str]): The arguments form the command line, sans the one with the name of this program (what the sys module's argv puts in the [0]th spot), thats what prog_arg is for.
@@ -584,7 +584,7 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
         force_cleanup_group = parser.add_mutually_exclusive_group()
         force_cleanup_group.add_argument('--fnc', '--force_no_cleanup',
                                          dest='force_no_cleanup', action='store_true',
-                                         help='Skip cleaning the database even if it might be usefull')
+                                         help='Skip cleaning the database even if it might be useful')
         force_cleanup_group.add_argument('--fc', '--force_cleanup',
                                          dest='force_cleanup', action='store_true',
                                          help='cleanup the database even if its not quite necessary')
@@ -667,7 +667,7 @@ def main(*args, prog_arg: Union[str, None] = None) -> bool:
                     -h or --help shows this
                     -m or --message specifies a message for the commit
                     All other arguments given will be tested for being a valid repository. The first one found will be the one selected.
-                    To receve a better command line experience please install 'argparse' to your python environment!""")
+                    To receive a better command line experience please install 'argparse' to your python environment!""")
                 return 0
 
             elif arglet.lower() == "-p" or arglet.lower() == "--path":

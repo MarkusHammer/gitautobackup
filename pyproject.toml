@@ -5,7 +5,7 @@
 [project]
     dynamic = ["version", "readme"]
     name = "gitautobackup"
-    description = "A basic CLI program and python module that allows for quickly making and comming changes to a git repository, along with a few other tools"
+    description = "A basic CLI program and python module that allows for quickly making and coming changes to a git repository, along with a few other tools"
     authors = [{ name = "Markus Hammer", email = "107761433+MarkusHammer@users.noreply.github.com" }]
     license = { file = "LICENSE" }
     dependencies = ["GitPython>=3.1.50", "typing-extensions;python_version<'3.8'", "pathlib2;python_version<'3.0'"]
@@ -30,7 +30,7 @@
         "backup",
         "git", 
         "commit",
-        "managment",
+        "management",
         "tool",
         "devtool",
         "small",

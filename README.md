@@ -18,7 +18,7 @@ or if you just want the module without the extra cli overhead (not suggested):
 
 If you prefer to have this as a standalone file and are **sure** that you have all dependences satisfied in some way you can also simply clone this repo into your project and import the ``gitautobackup.py`` file locally.
 
-> Please note that if this is the method you use, please ensure that the path is always specified, as if not it will default to the current terminal working directory, which if set to the location of your clone of this repository will result in making a commit to this project's clone. I only mention this as this is a mistake I have made myself quite a few times.
+> Please note that if this is the method you use, please ensure that the path is always specified, as if not it will default to the current terminal working directory, which if set to the location of your clone of this repository will result in making a commit to this project's clone - a mistake I have made myself quite a few times.
 
 ## Command Line Interface
 
@@ -100,6 +100,6 @@ This is licensed under the Mozilla Public License 2.0 (MPL 2.0) Licence. See the
 
 This project uses the ``pathlib`` (or alternatively ``pathlib2`` if ``pathlib2`` is available to import and ``pathlib`` is not), ``GitPython`` and optionally ``argparse`` modules, all very useful python modules. Check them out if you want to make a simple CLI script like this, or for whatever else you might be up to in python. Also thank you to the developers of these modules for making these as they helped keep my sanity in check.
 
-While not required, feel free to credit "*Markus Hammer*" (or just "*Markus*") if you find this code or script useful for whatever you may be doing with it.
+While not required, feel free to credit *"Markus Hammer"* (or just *"Markus"*) if you find this code or script useful for whatever you may be doing with it.
 
 **Thanks!**
