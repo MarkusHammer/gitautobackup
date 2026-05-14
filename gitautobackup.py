@@ -278,22 +278,20 @@ def resolve_repo(repo_path: Union[Path, str, None] = None,
 
 
 def print_output(msg:Union[str,None] = None, *, print_func:Callable = print):
-    """Print out and lightly format a message, only if it would not appear empty.
+    """Lightly format and rint out a message, only if it would not appear empty.
 
     Args:
         msg (Union[str,None], optional): The message to print. Defaults to None.
         print_func (Callable, optional): Override the print function possibly called. Defaults to the callable of ```print()```.
     """
-    
+
     if msg is None:
         return
 
-    msg = msg.strip()
+    msg = str(msg).strip()
 
-    if msg != "":
-        return
-
-    print_func(msg)
+    if msg:
+        print_func(msg)
 
 
 def repo_get_archive_formats(repo:Repo) -> Tuple[str, ...]:
