@@ -6,7 +6,7 @@ A basic CLI program and python module that allows for quickly making and committ
 
 ## Setup
 
-First off, this script uses the ``GitPython`` module, so ensure that you have a compatible version of git installed on your system so that ``GitPython`` can interface with it properly. For more info look [here](https://github.com/gitpython-developers/GitPython).
+First off, this script uses the ``GitPython`` module, so ensure that you have a compatible version of git installed on your system so that ``GitPython`` can interface with it properly. [For more info look here](https://github.com/gitpython-developers/GitPython).
 
 If not installed via pip, then the requirements for this script must be installed in the python environment. This script requires the ``git`` python module to be available in your python environment in order to run. To install both this script and the necessary dependencies (excluding `argparse`, as it's typically builtin), run:
 
