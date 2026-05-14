@@ -1,0 +1,23 @@
+# Normalize EOL for all files that Git considers text files.
+* text=auto eol=lf whitespace=trailing-space,space-before-tab
+
+*.txt text
+
+*.py text diff=python
+*.pyi text diff=python
+
+*.sh text diff=bash
+
+.env text diff=ini
+.flake8 text diff=ini
+.editorconfig text diff=ini
+*.yaml text diff=ini
+*.toml text diff=ini
+
+*.md text diff=markdown
+README text diff=markdown
+LICENCE text diff=markdown
+
+*.html text diff=html
+*.css text diff=css
+*.js test diff=html

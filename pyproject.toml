@@ -60,6 +60,14 @@
         version = {attr = "gitautobackup.__version__"}
         readme = {file = ["README.md", "SECURITY.md", "LICENSE"], content-type = "text/markdown"}
 
+[tool.pylint]
+	allow-wildcard-with-all = true
+[tool.pylint.'MAIN']
+	max-line-length = 100
+[tool.pylint.'MESSAGES CONTROL']
+    disable="too-many-arguments,too-many-branches,too-many-return-statements,too-many-instance-attributes,too-few-public-methods,too-many-lines"
+	enable="useless-suppression"
+
 ### NOTE THIS MUST BE BUILT USING A VERSION OF PYTHON >= 3.10, 3.9.1 and 3.8.7 #THX https://github.com/pypa/build/issues/255#issuecomment-794560752
 ### below are the commands used on windows
 ### py -3.10 -m pip install pip-tools validate-pyproject[all] build twine setuptools
