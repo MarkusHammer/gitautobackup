@@ -17,7 +17,7 @@
 __version__ = "2.0.1.2"
 
 try:
-    from git import Repo, InvalidGitRepositoryError, GitCommandNotFound, NoSuchPathError, RepositoryDirtyError, GitError
+    from git import Repo, GitCommandError, InvalidGitRepositoryError, GitCommandNotFound, NoSuchPathError, RepositoryDirtyError, GitError
 except ImportError as err:
     print("'GitPython', a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
     raise err
@@ -296,7 +296,7 @@ def print_output(msg:Union[str,None] = None, *, print_func:Callable = print):
     print_func(msg)
 
 
-def repo_get_archive_formats(repo:Repo) -> Tuple[str]:
+def repo_get_archive_formats(repo:Repo) -> Tuple[str, ...]:
     """Retrieves the possible archive formats (as git archive would accept) available to this specific repo on this specific system.
 
     Args:
@@ -305,7 +305,12 @@ def repo_get_archive_formats(repo:Repo) -> Tuple[str]:
     Returns:
         Tuple[str]: A tuple of all formats
     """
-    return tuple(x.strip() for x in repo.git.archive("--list").split())
+    try:
+        format_raw = repo.git.archive("--list")
+    except GitCommandError:
+        return tuple()
+    else:
+        return tuple(x.strip() for x in format_raw.split())
 
 
 def archive_repo(repo:Repo,
