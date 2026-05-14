@@ -14,7 +14,7 @@
     https://github.com/MarkusHammer/gitautobackup
 """
 
-__version__ = "2.0.1.2"
+__version__ = "2.0.2.0"
 
 try:
     from git import (Repo,
