@@ -90,9 +90,10 @@ class InvalidArchiveFormatError(GitError, Exception):
         return f"The format {self.given_format} is not a valid format for a archive in git. {('Valid formats are ' + ' '.join(self.possible_formats)) if len(self.possible_formats) > 0 else ''}"
 
 
-def path_hunt_dir(path: Union[Path, str, None]) -> Union['Path', None]:
-    
+def path_hunt_dir(path: Union[Path, str, None]) -> Union[Path, None]:
     """Gets the parent directory of a file if possible.
+    This will not resolve or expand anything, instead raising a `ValueError` if the path is not absolute.
+
     Args:
         path (Union[Path,str,None]): The path to search for the parent directory of. If this is set to None the return value will always also be None
 
@@ -105,18 +106,18 @@ def path_hunt_dir(path: Union[Path, str, None]) -> Union['Path', None]:
 
     path = Path(path)
 
+    if not path.is_absolute():
+        raise ValueError(f"Path {path} is not absolute.")
+
     if not path.exists():
         return None
 
-    path = path.expanduser()
-
-    while (not path.is_dir()) and len(path.parents) > 0:
-        path = path.parent
-
     if not path.is_dir():
-        return None
-    else:
-        return path
+        if len(path.parents) <= 0:
+            return None
+        path = path.parents[0]
+
+    return path
 
 
 def assert_file(path: Union[Path, str, None]):
@@ -144,6 +145,7 @@ def assert_file(path: Union[Path, str, None]):
 
 def assert_repo(path: Union[Path, str, None], allow_bare: bool = False):
     """Raises various exceptions to test if a path is or is not a git repo. This function does not return a value, use is_repo instead if you want that.
+    This expects for the provided path to be absolute otherwise raising a `ValueError`.
 
     Args:
         path (Union[Path,str,None]): The path to assert is a repository. Always raises NoSuchPathError when set to None.
@@ -159,7 +161,9 @@ def assert_repo(path: Union[Path, str, None], allow_bare: bool = False):
         raise NoSuchPathError()
 
     path = Path(path)
-    path = path.expanduser()
+
+    if not path.is_absolute():
+        raise ValueError(f"Path {path} is not absolute.")
 
     if not path.exists():
         raise NoSuchPathError()
@@ -186,7 +190,7 @@ def is_repo(path: Union[Path, str, None], allow_bare: bool = False) -> bool:
     retval = True
     try:
         assert_repo(path, allow_bare)
-    except (InvalidGitRepositoryError, NoSuchPathError, PermissionError): #DO NOT CATCH ANY InsecureRepositoryErrors these errors must be passed on!
+    except (InvalidGitRepositoryError, NoSuchPathError, PermissionError):  # DO NOT CATCH ANY InsecureRepositoryErrors or ValueErrors these errors must be passed on!
         retval = False
     return retval
 
@@ -257,12 +261,18 @@ def resolve_repo(repo_path: Union[Path, str, None] = None,
     if repo_path is None:
         raise InvalidGitRepositoryError()
 
-    repo_path = Path(repo_path)
+    repo_path = Path(repo_path).expanduser().absolute()
+
     if not repo_path.exists():
         raise NoSuchPathError()
-    while not is_repo(repo_path) and len(repo_path.parents) > 0:
-        repo_path = repo_path.parent
-    assert_repo(repo_path)
+
+    if not is_repo(repo_path):
+        for closest_parent in repo_path.parents:
+            if is_repo(closest_parent):
+                repo_path = closest_parent
+                break
+        else:
+            assert_repo(repo_path)
 
     return Repo(repo_path)
 
