@@ -1,18 +1,18 @@
-'''
+"""
     autoback: A simple python script and module to make a automatic backup of a git repository.
     Includes both a CLI interface as well as a module interface for individual functions as well as
         a function that accepts arguments like the CLI interface.
-    
-    By Markus Hammer 2023
+
+    By Markus Hammer 2023 - 2026
 
     Licenced under the Mozilla Public License 2.0 (MPL 2.0)
     Read the included 'LICENCE' file for more information.
 
     See the github repo for more info!
-    
+
     This project is on github here:
     https://github.com/MarkusHammer/gitautobackup
-'''
+"""
 
 __version__ = "2.0.1.2"
 
@@ -26,9 +26,9 @@ try:
     from pathlib import Path
 except ImportError as native_err:
     try:
-        from pathlib2 import Path
+        from pathlib2 import Path  # type:ignore
     except ImportError as backport_err:
-        print("'pathlib' (nor its backport: 'pathlib2'), a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
+        print("'pathlib' (nor its backport: 'pathlib2'), a required dependency, could not be imported. You may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
         raise native_err from backport_err
 
 try:
@@ -69,9 +69,8 @@ except ImportError:
     ArgumentParser = None
 
 
-
-class InvalidArchiveFormatError(GitError, Exception):
-    """Raised when a format for git archive when that format is not a valid format for git archive"""    
+class InvalidArchiveFormatError(GitError, ValueError):
+    """Raised when a format for git archive when that format is not a valid format for git archive"""
 
     def __init__(self, given_format:str, possible_formats:Union[List[str], None] = None):
         """
@@ -81,10 +80,7 @@ class InvalidArchiveFormatError(GitError, Exception):
         """
 
         self.given_format:str = given_format
-        self.possible_formats:List[str] = []
-
-        if possible_formats is not None:
-            self.possible_formats = possible_formats
+        self.possible_formats:List[str] = possible_formats or []
 
     def __str__(self) -> str:
         return f"The format {self.given_format} is not a valid format for a archive in git. {('Valid formats are ' + ' '.join(self.possible_formats)) if len(self.possible_formats) > 0 else ''}"
@@ -254,7 +250,7 @@ def resolve_repo(repo_path: Union[Path, str, None] = None,
     Returns:
         Repo: The resolved git repo object.
     """
-    
+
     if further_guess_paths and repo_path is None:
         repo_path = get_default_file_location()
 
@@ -318,7 +314,7 @@ def archive_repo(repo:Repo,
                  verbose:bool = False
                 ):
     """Archives a repository object to the given path (or paths), with the specified format, or the default format if not provided.
-    
+
     Args:
         repo(Repo): The Repo object in question, the one to create an archive from.
         archive_paths(Union[Path, str, List[Union[Path, str]]): The (or a list or tuple of multiple) path (as a path object or string) to save the archive to.
@@ -336,7 +332,7 @@ def archive_repo(repo:Repo,
             elif archive_format.upper() in valid_archive_formats:
                 archive_format = archive_format.upper()
             else:
-                raise InvalidArchiveFormatError(archive_format, valid_archive_formats)
+                raise InvalidArchiveFormatError(archive_format, list(valid_archive_formats))
 
     if not isinstance(archive_paths, (list, tuple)):
         archive_paths = (archive_paths, )
@@ -362,7 +358,7 @@ def cleanup_repo(repo:Repo,
                  cleanup_aggressive:bool = False,
                  *,
                  verbose:bool = False
-                ):
+                 ):
     """Attempts to garbage collect the given Repo if needed or forced. Can be done aggressively if specified.
 
     Args:
@@ -491,7 +487,7 @@ def main_cli(repo_path: Union[Path, str, None] = None,
         bool: If commit was made to the repository.
     """
 
-    made_a_backup: bool = False
+    made_backup: bool = False
 
     repo = resolve_repo(repo_path, further_guess_paths=further_guess_paths)
 
@@ -503,7 +499,7 @@ def main_cli(repo_path: Union[Path, str, None] = None,
         if force_commit or repo.is_dirty(untracked_files=True):
             if verbose:
                 print("Commit...")
-            made_a_backup = True
+            made_backup = True
             commit_repo(repo, commit_message, force_commit, tag, force_tag, tag_message, verbose=verbose)
 
         if force_cleanup is None or force_cleanup is True:
@@ -516,7 +512,7 @@ def main_cli(repo_path: Union[Path, str, None] = None,
                 print("Archive...")
             archive_repo(repo, archive_paths, archive_format, verbose=verbose)
 
-    return made_a_backup
+    return made_backup
 
 
 def main(*argv:str, prog_arg: Union[str, None] = None) -> bool:
@@ -691,7 +687,7 @@ if __name__ == "__main__":  # this is the only way the CLI could be run
 
     def _main_entry():
         """PRIVATE USED TO RUN DIRECTLY FORM THE COMMAND LINE DO NOT USE THIS IF USING THIS AS A MODULE"""
-        exitcode = -1 #while this is the default error code, -1 is also always used for an unknown error
+        exitcode = -1  # while this is the default error code, -1 is also always used for an unknown error
         try:
             exitcode = 0 if main(*tuple(cliargv[1:]), prog_arg=cliargv[0]) else 1 #1 means no error but also no changes, 0 is no error and changes where made
         except GitCommandNotFound:

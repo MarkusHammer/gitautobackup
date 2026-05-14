@@ -12,7 +12,7 @@ If not installed via pip, then the requirements for this script must be installe
 
 ``pip install gitautobackup``
 
-If you prefer to have this as a standalone file and are **sure** that you have all dependences satisfied in some way you can also simply clone this repo into your project and import the ``gitautobackup.py`` file locally.
+If you prefer to have this as a standalone file and are sure all dependences are satisfied, then you can also simply download/clone the `gitautobackup.py` and use as is.
 
 > Please note that if this is the method you use, please ensure that the path is always specified, as if not it will default to the current terminal working directory, which if set to the location of your clone of this repository will result in making a commit to this project's clone - a mistake I have made myself quite a few times.
 

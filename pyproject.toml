@@ -28,7 +28,7 @@
     ]
     keywords = [
         "backup",
-        "git", 
+        "git",
         "commit",
         "management",
         "tool",
@@ -40,7 +40,7 @@
     ]
     [project.optional-dependencies]
         dev = ["setuptools>=64.0.0", "pip-tools", "validate-pyproject[all]", "build", "twine"]
-    [project.scripts] 
+    [project.scripts]
         gitautobackup = "gitautobackup:__main__"
         gitbackup = "gitautobackup:__main__"
     [project.urls]
