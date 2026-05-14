@@ -17,9 +17,19 @@
 __version__ = "2.0.1.2"
 
 try:
-    from git import Repo, GitCommandError, InvalidGitRepositoryError, GitCommandNotFound, NoSuchPathError, RepositoryDirtyError, GitError
+    from git import (Repo,
+                     GitCommandError,
+                     InvalidGitRepositoryError,
+                     GitCommandNotFound,
+                     NoSuchPathError,
+                     RepositoryDirtyError,
+                     GitError
+                     )
 except ImportError as err:
-    print("'GitPython', a required dependency, could not be imported, you may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
+    print("'GitPython', a required dependency, could not be imported,",
+          "you may need to install this module (for example, using pip),",
+          "or change your python environment to allow access to this module."
+          )
     raise err
 
 try:
@@ -28,7 +38,11 @@ except ImportError as native_err:
     try:
         from pathlib2 import Path  # type:ignore
     except ImportError as backport_err:
-        print("'pathlib' (nor its backport: 'pathlib2'), a required dependency, could not be imported. You may need to install this module (for example, using pip), or change your python environment to allow access to this module.")
+        print("`pathlib` (nor its backport: `pathlib2`),",
+              "a required dependency, could not be imported.",
+              "You may need to install this module (for example, using pip),",
+              "or change your python environment to allow access to this module."
+              )
         raise native_err from backport_err
 
 try:
@@ -56,45 +70,61 @@ try:
 except ImportError:
     try:
         from time import time
-        now_string = lambda: str(time())  # pylint:disable=unnecessary-lambda-assignment
+        # pylint:disable-next=unnecessary-lambda-assignment
+        now_string = lambda: str(time())  # noqa:E731
     except ImportError:
+        # pylint:disable-next=invalid-name
         now_string = None
 else:
-    now_string = lambda: str(datetime.now())  # pylint:disable=unnecessary-lambda-assignment
+    # pylint:disable-next=unnecessary-lambda-assignment
+    now_string = lambda: str(datetime.now())  # noqa:E731
 
 try:
     from argparse import ArgumentParser as _ArgumentParser
     ArgumentParser = _ArgumentParser
 except ImportError:
+    # pylint:disable-next=invalid-name
     ArgumentParser = None
 
 
 class InvalidArchiveFormatError(GitError, ValueError):
-    """Raised when a format for git archive when that format is not a valid format for git archive"""
+    """
+    Raised when a format for git archive when that format
+    is not a valid format for git archive.
+    """
 
     def __init__(self, given_format:str, possible_formats:Union[List[str], None] = None):
         """
         Args:
             format (str): The issue causing format.
-            repo_reference (Union[Repo, None], optional): A optional list of possible valid formats, or None if this cant be given.
+            repo_reference (Union[Repo, None], optional):
+                An optional list of possible valid formats,
+                or None if this cant be given.
+                Defaults to None.
         """
 
         self.given_format:str = given_format
         self.possible_formats:List[str] = possible_formats or []
 
     def __str__(self) -> str:
-        return f"The format {self.given_format} is not a valid format for a archive in git. {('Valid formats are ' + ' '.join(self.possible_formats)) if len(self.possible_formats) > 0 else ''}"
+        formats_are = ""
+        if len(self.possible_formats) > 0:
+            formats_are = 'Valid formats are ' + ' '.join(self.possible_formats)
+        return f"{self.given_format} is not a valid format for a archive in git. {formats_are}"
 
 
 def path_hunt_dir(path: Union[Path, str, None]) -> Union[Path, None]:
     """Gets the parent directory of a file if possible.
-    This will not resolve or expand anything, instead raising a `ValueError` if the path is not absolute.
+    This will not resolve or expand anything,
+    instead raising a `ValueError` if the path is not absolute.
 
     Args:
-        path (Union[Path,str,None]): The path to search for the parent directory of. If this is set to None the return value will always also be None
+        path (Union[Path,str,None]): The path to search for the parent directory of.
+            If this is set to None the return value will always also be None
 
     Returns:
-        Union[Path,None]: Returns a Path of the directory if a directory was found, or None if one couldn't be found
+        Union[Path,None]: Returns a Path of the directory if a directory was found,
+            or None if one couldn't be found
     """
 
     if path is None:
@@ -140,16 +170,26 @@ def assert_file(path: Union[Path, str, None]):
 
 
 def assert_repo(path: Union[Path, str, None], allow_bare: bool = False):
-    """Raises various exceptions to test if a path is or is not a git repo. This function does not return a value, use is_repo instead if you want that.
+    """Raises various exceptions to test if a path is or is not a git repo.
+    This function does not return a value, use is_repo instead if you want that.
     This expects for the provided path to be absolute otherwise raising a `ValueError`.
 
     Args:
-        path (Union[Path,str,None]): The path to assert is a repository. Always raises NoSuchPathError when set to None.
-        allow_bare (bool, optional): Don't raise InvalidGitRepositoryError if the repository is bare. Defaults to False.
+        path (Union[Path,str,None]): The path to assert is a repository.
+            Always raises NoSuchPathError when set to None.
+        allow_bare (bool, optional): Don't raise InvalidGitRepositoryError
+            if the repository is bare. Defaults to False.
 
     Raises:
-        NOTE: This may not be a comprehensive list of all possible exceptions raised, as pathlib or git may raise various other exceptions as well, however what is stated below is the behaviour explicitly defined in raise statements.
-        InvalidGitRepositoryError: Raised when the folder could not be opened as a git repo, if the path couldn't possibly be a git repo (if its not a directory and does not end with ".git"), or if it can be opened but it is a bare repo and allow_bare is False.
+        NOTE: This may not be a comprehensive list of all possible exceptions raised,
+            as pathlib or git may raise various other exceptions as well,
+            however what is stated below is the behaviour explicitly defined
+            in raise statements.
+        InvalidGitRepositoryError: Raised when the folder could not be
+            opened as a git repo,
+            if the path couldn't possibly be a git repo
+            (ex. if its not a directory and does not end with ".git"),
+            or if it can be opened but it is a bare repo and allow_bare is False.
         NoSuchPathError: Raised when the path is None or doesn't exist on the system.
     """
 
@@ -173,11 +213,16 @@ def assert_repo(path: Union[Path, str, None], allow_bare: bool = False):
 
 
 def is_repo(path: Union[Path, str, None], allow_bare: bool = False) -> bool:
-    """Returns bool if a path is a git repo. This returns a value and doesn't raise an exception, use assert_repo instead if you want that.
+    """
+    Returns bool if a path is a git repo.
+    This returns a value and doesn't raise an exception,
+    use assert_repo instead if you want that.
 
     Args:
-        path (Union[Path,str,None]): The path to assert is a repository. Returns False when set to None.
-        allow_bare (bool, optional): Don't raise InvalidGitRepositoryError if the repository is bare. Defaults to False.
+        path (Union[Path,str,None]): The path to assert is a repository.
+            Returns False when set to None.
+        allow_bare (bool, optional): Don't fail if the repository is bare.
+            Defaults to False.
 
     Returns:
         bool: Weather or not the path given is a git repository.
@@ -186,19 +231,26 @@ def is_repo(path: Union[Path, str, None], allow_bare: bool = False) -> bool:
     retval = True
     try:
         assert_repo(path, allow_bare)
-    except (InvalidGitRepositoryError, NoSuchPathError, PermissionError):  # DO NOT CATCH ANY InsecureRepositoryErrors or ValueErrors these errors must be passed on!
+    except (InvalidGitRepositoryError, NoSuchPathError, PermissionError):
+        # DO NOT CATCH ANY InsecureRepositoryErrors or ValueErrors,
+        # these errors must be passed on!
         retval = False
     return retval
 
 
 def default_commit_name(no_datetime: bool = False) -> str:
-    """Returns the default commit name, generated based on if the system has the datetime module accessible and if its allowed.
+    """
+    Returns the default commit name,
+    generated based on if the system has the datetime module accessible
+    (or failing that, if `time.time` is accessible instead)
+    and if its allowed.
 
     Args:
-        no_datetime (bool, optional): Don't allow use fo the datetime module. Defaults to False.
+        no_datetime (bool, optional): Don't allow use of the datetime or time modules.
+        Defaults to False.
 
     Returns:
-        str: The ideal default commit name.
+        str: The generated default commit name.
     """
 
     if not no_datetime and now_string is not None:
@@ -207,10 +259,14 @@ def default_commit_name(no_datetime: bool = False) -> str:
 
 
 def get_default_file_location() -> Union[Path, None]:
-    """Returns the most relevant default file location based on how this script/module is run and what is accessible. Returns None if nothing could be determined.
+    """
+    Returns the most relevant default file location is based
+    on how this script/module is run.
+    Returns None if nothing could be determined.
 
     Returns:
-        Union[Path,None]: The path that was found, it one was found. If not this will be None.
+        Union[Path,None]: The path that was found, it one was found.
+            If not this will be None.
     """
 
     possible_path = path_hunt_dir(Path.cwd().expanduser().absolute())
@@ -218,8 +274,9 @@ def get_default_file_location() -> Union[Path, None]:
         return possible_path
 
     # this only really helps if this file is run as the main script.
-    # Unlikely that it will be needed however because argv is almost always guaranteed
-    #   to work on any system that is able to support the mandatory requirements of this script anyway.
+    # Unlikely that it will be needed however because argv is almost always
+    # guaranteed to work on any system that is able to support
+    # the mandatory requirements of this script anyway.
     # Still good for a plan c however ...
     if __name__ == "__main__":
         try:
@@ -237,11 +294,19 @@ def get_default_file_location() -> Union[Path, None]:
 def resolve_repo(repo_path: Union[Path, str, None] = None,
                  further_guess_paths: bool = False
                  ) -> Repo:
-    """Attempts to smartley resolve a path to find a gitrepo withing it and possibly the default path location (as given by ```get_default_file_location```) if enabled.
+    """
+    Attempts to smartley resolve a path to find a gitrepo withing it
+    and possibly the default path location
+    (as given by `get_default_file_location`) if enabled.
 
     Args:
-        repo_path (Union[Path, str, None], optional): The path to look for a git repo in. Defaults to None.
-        further_guess_paths (bool, optional): If the path is not defined, should the default path (as given by ```get_default_file_location```) be used instead. Defaults to False.
+        repo_path (Union[Path, str, None], optional): The path to look for
+            a git repo in.
+            Defaults to None.
+        further_guess_paths (bool, optional): If the path is not defined,
+            should the default path (as given by `get_default_file_location`)
+            be used instead.
+            Defaults to False.
 
     Raises:
         InvalidGitRepositoryError: The path exists, but is not a git repo.
@@ -277,8 +342,10 @@ def print_output(msg:Union[str,None] = None, *, print_func:Callable = print):
     """Lightly format and rint out a message, only if it would not appear empty.
 
     Args:
-        msg (Union[str,None], optional): The message to print. Defaults to None.
-        print_func (Callable, optional): Override the print function possibly called. Defaults to the callable of ```print()```.
+        msg (Union[str,None], optional): The message to print.
+            Defaults to None.
+        print_func (Callable, optional): Override the print function possibly called.
+            Defaults to `print`.
     """
 
     if msg is None:
@@ -291,7 +358,9 @@ def print_output(msg:Union[str,None] = None, *, print_func:Callable = print):
 
 
 def repo_get_archive_formats(repo:Repo) -> Tuple[str, ...]:
-    """Retrieves the possible archive formats (as git archive would accept) available to this specific repo on this specific system.
+    """
+    Retrieves the possible archive formats (as git archive would accept)
+    available to this specific repo on this specific system.
 
     Args:
         repo (Repo): A repository to use to query what archive formats are available.
@@ -312,14 +381,25 @@ def archive_repo(repo:Repo,
                  archive_format:Union[str, None] = None,
                  *,
                  verbose:bool = False
-                ):
-    """Archives a repository object to the given path (or paths), with the specified format, or the default format if not provided.
+                 ):
+    """
+    Archives a repository object to the given path (or paths),
+    with the specified format,
+    or the default format if not provided.
 
     Args:
         repo(Repo): The Repo object in question, the one to create an archive from.
-        archive_paths(Union[Path, str, List[Union[Path, str]]): The (or a list or tuple of multiple) path (as a path object or string) to save the archive to.
-        archive_format(Union[str, None], optional): The string of the archive format to use, as is returned by ```repo_get_archive_formats()```, not case sensitive. Defaults to None.
-        verbose (bool, optional): Should the outputs of the functions be passed into the terminal. Defaults to False.
+        archive_paths(Union[Path, str, List[Union[Path, str]]):
+            The path (or a list or tuple of multiple, as a path objects or strings)
+            to save the archive to.
+        archive_format(Union[str, None], optional):
+            The string of the archive format to use,
+            as is returned by `repo_get_archive_formats()`,
+            not case sensitive.
+            Defaults to None.
+        verbose (bool, optional):
+            Should the outputs of the functions be passed into the terminal.
+            Defaults to False.
     """
 
     if archive_format is not None:
@@ -359,13 +439,21 @@ def cleanup_repo(repo:Repo,
                  *,
                  verbose:bool = False
                  ):
-    """Attempts to garbage collect the given Repo if needed or forced. Can be done aggressively if specified.
+    """
+    Attempts to garbage collect the given Repo if needed or forced.
+    Can be done aggressively if specified.
 
     Args:
         repo (Repo):  The Repo object in question, the one to garbage collect.
-        force_cleanup (Union[bool, None], optional): Weather or not to cleanup even if not really needed. Defaults to None.
-        cleanup_aggressive (bool, optional): If cleaning up, should it be done aggressively? Defaults to False.
-        verbose (bool, optional): Should the outputs of the functions be passed into the terminal. Defaults to False.
+        force_cleanup (Union[bool, None], optional):
+            Weather or not to cleanup even if not really needed.
+            Defaults to None.
+        cleanup_aggressive (bool, optional):
+            If cleaning up, should it be done aggressively?
+            Defaults to False.
+        verbose (bool, optional):
+            Should the outputs of the functions be passed into the terminal?
+            Defaults to False.
     """
     cmd_args = []
     if cleanup_aggressive:
@@ -387,16 +475,31 @@ def commit_repo(repo:Repo,
                 *,
                 verbose:bool = False
                 ):
-    """Makes a commit of all changes to the repository, with any specified message, tag, and tag message.
+    """
+    Makes a commit of all changes to the repository,
+    with any specified message, tag, and tag message.
 
     Args:
         repo (Repo): The Repo object in question, the one to commit all changes to.
-        commit_message (Union[str, None], optional): The message to add to a commit. If None or not printable (whitespace) this will be automatically generated using ```default_commit_name()``` Defaults to None.
-        force_commit (bool, optional): Make a commit even if it would not contain any changes. Defaults to False.
-        tag (Union[str,None], optional): The tag to add to the repository. No tag is added if set to None. Defaults to None.
-        force_tag (bool, optional): Overwrite a tag if it already exists. Defaults to False.
-        tag_message (Union[str, None], optional): A message to add to the tag. No message is added if set to None. Defaults to None.
-        verbose (bool, optional): Should the outputs of the functions be passed into the terminal. Defaults to False.
+        commit_message (Union[str, None], optional): The message to add to a commit.
+            If None or not printable (whitespace) this will be automatically generated using
+            `default_commit_name()`.
+            Defaults to None.
+        force_commit (bool, optional):
+            Make a commit even if it would not contain any changes.
+            Defaults to False.
+        tag (Union[str,None], optional):
+            The tag to add to the repository.
+            No tag is added if set to None.
+            Defaults to None.
+        force_tag (bool, optional): Overwrite a tag if it already exists.
+            Defaults to False.
+        tag_message (Union[str, None], optional): A message to add to the tag.
+            No message is added if set to None.
+            Defaults to None.
+        verbose (bool, optional):
+            Should the outputs of the functions be passed into the terminal?
+            Defaults to False.
     """
 
     msg = repo.git.add("--all", "--ignore-errors")
@@ -450,37 +553,93 @@ def main_cli(repo_path: Union[Path, str, None] = None,
              force_cleanup: Union[bool, None] = None,
              cleanup_aggressive:bool = False,
 
-             archive_paths:Union[Path, str, None, List[Union[Path, str]], Tuple[Union[Path, str]]] = None,
+             archive_paths:Union[Path,
+                                 str,
+                                 None,
+                                 List[Union[Path, str]],
+                                 Tuple[Union[Path, str]]
+                                 ] = None,
              archive_format:Union[str, None] = None,
 
              *,
 
              verbose: bool = True,
-            ) -> bool:
-    """Run the main command line interface's actions. The main CLI calls this, but this may also be called as a function if using this as a module. While not suggested, if you wish to pass cli arguments instead, please use the ```main()```function instead if possible.
+             ) -> bool:
+    """
+    Run the main command line interface's actions.
+    The main CLI calls this,
+    but this may also be called as a function if using this as a module.
+    While not suggested, if you wish to pass cli arguments instead,
+    please use the `main()`function instead if possible.
 
     Args:
-        repo_path (Union[Path,None], optional): The path of the target git repository. If set to None and further_guess_paths is set there will be an attempts to determine this using ```get_default_file_location()```. Defaults to None.
-        further_guess_paths (bool, optional): If the path is set to none, should there be attempt to automatically guess the relevant path using ```get_default_file_location()```. Defaults to False.
+        repo_path (Union[Path,None], optional):
+            The path of the target git repository.
+            If set to None and further_guess_paths is set
+            there will be an attempts to determine this using
+            `get_default_file_location`.
+            Defaults to None.
+        further_guess_paths (bool, optional): If the path is set to None,
+            should there be attempt to automatically guess the relevant path using
+            `get_default_file_location`.
+            Defaults to False.
 
-        commit_message (Union[str,None], optional): The message of the commit being made. If None this will be automatically generated using ```default_commit_name()```. Defaults to None.
-        force_commit (bool, optional): Should a commit be made even if there is nothing to be committed? Defaults to False.
-        tag (Union[str,None], optional): If a tag should be created, this should be the name of that tag. If no tag is to be made, this should be None, even if tag_force is True
-        force_tag (bool, optional): Create the new tag even if an old one already exists. No effect if tag is None.
-        tag_message (Union[str,None], optional): Add a message to the tag, or None if the tag should have no message. No effect if tag is None.
+        commit_message (Union[str,None], optional):
+            The message of the commit being made.
+            If None this will be automatically generated using
+            `default_commit_name`.
+            Defaults to None.
+        force_commit (bool, optional):
+            Should a commit be made even if there is nothing to be committed?
+            Defaults to False.
+        tag (Union[str,None], optional):
+            If a tag should be created, this should be the name of that tag.
+            If no tag is to be made, this should be None, even if tag_force is True.
+            Defaults to None.
+        force_tag (bool, optional):
+            Create the new tag even if an old one already exists.
+            No effect if tag is None.
+            Defaults to False.
+        tag_message (Union[str,None], optional):
+            Add a message to the tag, or None if the tag should have no message.
+            No effect if tag is None.
+            Defaults to None.
 
-        force_cleanup (Union[bool, None], optional): Should (or shouldn't) the database be cleaned despite it possibly being beneficial. True forces the database to be cleaned, False forces the database to not be cleaned, and None allows for this to be automatically determined by git instead. Defaults to None.
-        cleanup_aggressive (bool, optional): If the repo is cleaned, should it be done aggressively?
+        force_cleanup (Union[bool, None], optional):
+            Should the git database be 'cleaned'?
+            Runs `git gc` if True.
+            True forces the database to be cleaned,
+            False forces the database to not be cleaned,
+            and None allows for this to be automatically determined by git instead.
+            This typically is not necessary to force this in most cases
+            so its best to leave this as None or False.
+            Defaults to None.
+        cleanup_aggressive (bool, optional):
+            If the repo is cleaned, should it be done aggressively?
+            Defaults to False.
 
-        archive_path (Union[Path,None], optional): If set to None no archive will be made, otherwise a archive will be output to the given location.
-        archive_format (Union[str, None], optional): If set this will override the format of the archive being outputted, if set to None it will be inferred form the path.
+        archive_path (Union[Path,None], optional):
+            If set to None no archive will be made,
+            otherwise an archive will be output at the given path.
+            Defaults to None.
+        archive_format (Union[str, None], optional):
+            If set this will override the format of the archive being outputted,
+            if set to None it will be inferred form the path.
+            Defaults to None.
 
-        verbose (bool, optional): Should this function print out non error related messages? Defaults to True.
+        verbose (bool, optional):
+            Should this function print out non error related messages?
+            Defaults to True.
 
     Raises:
-        NOTE: This may not be a comprehensive list of all possible exceptions raised, as pathlib or git may raise various other exceptions as well, however what is stated below is the behaviour explicitly defined in raise statements.
-        InvalidGitRepositoryError: Raised when the folder could not be opened as a git repo, if the path couldn't possibly be a git repo (if its not a directory and does not end with ".git"), or if it can be opened but it is a bare repo and allow_bare is False.
-        InvalidArchiveFormatError: Raised when the given archive format is not a valid format for git archive.
+        InvalidGitRepositoryError:
+            Raised when the folder could not be opened as a git repo,
+            if the path couldn't possibly be a git repo
+            (if its not a directory and does not end with ".git"),
+            or if it can be opened but it is a bare repo and allow_bare is False.
+        InvalidArchiveFormatError:
+            Raised when the given archive format is not a valid format
+            for git archive.
         NoSuchPathError: Raised when the path doesn't exist on the system.
 
     Returns:
@@ -492,7 +651,9 @@ def main_cli(repo_path: Union[Path, str, None] = None,
     repo = resolve_repo(repo_path, further_guess_paths=further_guess_paths)
 
     if verbose:
-        print(f"Opening path as repo: {Path(repo.common_dir).parent} {'and forcing a commit' if force_commit else ''}...")
+        print(f"Opening path as repo: {Path(repo.common_dir).parent}",
+              f"{'and forcing a commit' if force_commit else ''}..."
+              )
 
     with repo:
 
@@ -500,7 +661,14 @@ def main_cli(repo_path: Union[Path, str, None] = None,
             if verbose:
                 print("Commit...")
             made_backup = True
-            commit_repo(repo, commit_message, force_commit, tag, force_tag, tag_message, verbose=verbose)
+            commit_repo(repo,
+                        commit_message,
+                        force_commit,
+                        tag,
+                        force_tag,
+                        tag_message,
+                        verbose=verbose
+                        )
 
         if force_cleanup is None or force_cleanup is True:
             if verbose:
@@ -516,16 +684,31 @@ def main_cli(repo_path: Union[Path, str, None] = None,
 
 
 def main(*argv:str, prog_arg: Union[str, None] = None) -> bool:
-    """A function that when used as a module acts as the main entry point of the program. This allows for you to use this as you would normally via the cli but still import this as a module.
-    Please note however that argv is only intended for the cli arguments and not for the name of the script running this, thats what the optional prog_arg argument is intended for.
-    Also note that this function does not handle exceptions unlike how the cli turns these into user friendly messages. This is intended as the user of a module will most likely find these exceptions useful.
+    """
+    A function that when used as a module acts as the main entry point of the program.
+    This allows for you to use this as you would normally via the cli but still import
+    this as a module.
+    Please note however that `argv` is only intended for the cli arguments
+    after the name of this script, and not for the name of the script running this.
+    To specify the script name as given in `argv`, use `prog_arg`
+    Also note that this function does not handle exceptions unlike
+    how the cli turns these into user friendly messages.
+    The handling behaviour of exception is not exposed.
+    It is expected that the user of this function will handle
+    these exceptions themselves.
 
     Args:
-        *args (Tuple[str]): The arguments form the command line, sans the one with the name of this program (what the sys module's argv puts in the [0]th spot), thats what prog_arg is for.
-        prog_arg (Union[str, None], optional): This is used for what is traditionally used as the [0]th member if argv, the name of this program as it was called in the command line. THis is however, completely optional. Defaults to None.
+        *args (Tuple[str]): The arguments form the command line,
+            sans the one with the name of this program
+            (what the sys module's argv puts in the [0]th spot).
+        prog_arg (Union[str, None], optional):
+            This is used for what is traditionally used as the [0]th member if argv,
+            the name of this program as it was called in the command line.
+            This completely optional.
+            Defaults to None.
 
     Returns:
-        bool: weather or not a backup was made
+        bool: Weather or not a backup was made
     """
 
     path = None
@@ -545,60 +728,122 @@ def main(*argv:str, prog_arg: Union[str, None] = None) -> bool:
     if ArgumentParser is not None:
         parser = ArgumentParser(prog=prog_arg,
                                 description="""
-                                A basic CLI program that allows for quick formatting of a .gitignore file
+                                A CLI program for preforming quick tasks on a git repository.
                                 """)
 
         parser.add_argument('-p', '--path', '-d', '--dest', '-r', '--repo',
-                            dest='repo_path', action='store', default=path, type=str,
+                            dest='repo_path',
+                            action='store',
+                            default=path,
+                            type=str,
                             help='The location of the git repo')
-        parser.add_argument('-m', '--message', '-b', '--body', '-c', '--cm', '--commit_message', '-n', '--name', '--cn', '--commit_name',
-                            dest='commit_message', action='store', default=commit_message, type=str,
-                            help="The message of the commit. Note that this defaults to the message of the form 'Autosave at DATE TIME HERE' not to None as it might say")
+        parser.add_argument('-m', '--message', '-b', '--body', '-c',
+                            '--cm', '--commit_message', '-n', '--name',
+                            '--cn', '--commit_name',
+                            dest='commit_message',
+                            action='store',
+                            default=commit_message,
+                            type=str,
+                            help=(
+                                "The message of the commit. " +
+                                "The defaults to the message is in the form of " +
+                                "'Autosave at <DATE TIME HERE>'."
+                            )
+                            )
         parser.add_argument('-t', '--tag', '--commit_tag', '--tn', '--tag_name',
-                            dest='tag', action='store', default=tag, type=str,
-                            help="Assign a tag of the specified name to the commit. If this flag is not used no tag will be made.")
+                            dest='tag',
+                            action='store',
+                            default=tag,
+                            type=str,
+                            help=(
+                                "Assign a tag of the specified name to the commit. " +
+                                "If this flag is not used no tag will be made."
+                            )
+                            )
         parser.add_argument('--tm', '--tag_message', '--tm', '--tag_message',
-                            dest='tag_message', action='store', default=tag_message, type=str,
-                            help="Set a message for the tag of this commit. Only effective if the tag flag is also used, otherwise there is no effect.")
+                            dest='tag_message',
+                            action='store',
+                            default=tag_message,
+                            type=str,
+                            help=(
+                                "Set a message for the tag of this commit. " +
+                                "Only effective if the tag flag is also used, " +
+                                "otherwise there is no effect."
+                            )
+                            )
 
         parser.add_argument('-a', '--archive', '--ap', '--archive_path',
-                            dest='archive_path', action='store', default=archive_path, type=str,
-                            help="A path to the location of the desired archive to be made. If not defined no archive will be made.")
+                            dest='archive_path',
+                            action='store',
+                            default=archive_path,
+                            type=str,
+                            help=(
+                                "A path to the location of the desired archive to be made. " +
+                                "If not defined no archive will be made."
+                            )
+                            )
         parser.add_argument('--af', '--archive_format',
-                            dest='archive_format', action='store', default=archive_format, type=str,
-                            help="Force the given type of format to be used for the file. If not defined it will be taken from the given path.")
+                            dest='archive_format',
+                            action='store',
+                            default=archive_format,
+                            type=str,
+                            help=(
+                                "Force the given type of format to be used " +
+                                "for the file. " +
+                                "If not defined it will be taken from the given path."
+                            )
+                            )
 
         parser.add_argument('-f', '--force', '--force_commit',
-                            dest='force_commit', action='store_true', default=force_commit,
-                            help='Push a commit to the repo even if there are no changes')
+                            dest='force_commit',
+                            action='store_true',
+                            default=force_commit,
+                            help=(
+                                "Push a commit to the repo " +
+                                "even if there are no changes"
+                            )
+                            )
         parser.add_argument('--ft', '--force_tag',
-                            dest='force_tag', action='store_true', default=force_tag,
-                            help='If a tag is to be made, force it to overwrite any existing tags that may be in its way')
+                            dest='force_tag',
+                            action='store_true',
+                            default=force_tag,
+                            help=(
+                                'If a tag is to be made, ' +
+                                'force it to overwrite any existing tags ' +
+                                'that may be in its way'
+                            )
+                            )
 
         force_cleanup_group = parser.add_mutually_exclusive_group()
         force_cleanup_group.add_argument('--fnc', '--force_no_cleanup',
-                                         dest='force_no_cleanup', action='store_true',
-                                         help='Skip cleaning the database even if it might be useful')
+                                         dest='force_no_cleanup',
+                                         action='store_true',
+                                         help='Skip cleaning the git database.')
         force_cleanup_group.add_argument('--fc', '--force_cleanup',
-                                         dest='force_cleanup', action='store_true',
-                                         help='cleanup the database even if its not quite necessary')
+                                         dest='force_cleanup',
+                                         action='store_true',
+                                         help='Cleanup the git database even if unnecessary.')
         force_cleanup_group.add_argument('--fca', '--force_cleanup_aggressive',
-                                         dest='force_cleanup_aggressive', action='store_true',
-                                         help='cleanup the database aggressively, even if its not quite necessary')
+                                         dest='force_cleanup_aggressive',
+                                         action='store_true',
+                                         help='Cleanup the git database aggressively.')
 
         loudness_group = parser.add_mutually_exclusive_group()
         loudness_group.add_argument("-v", "--verbose",
-                                    dest="verbose", action="store_true",
+                                    dest="verbose",
+                                    action="store_true",
                                     help="Print a verbose output of the process")
         loudness_group.add_argument("-q", "--quiet",
-                                    dest="quiet", action="store_true",
+                                    dest="quiet",
+                                    action="store_true",
                                     help="Avoid printing anything to the terminal if possible")
 
-        # don't forget to update it in the pyproject.toml to!
         parser.add_argument("--ver", "--version",
-                            action='version', version=__version__)
+                            action='version',
+                            version=__version__)
         parser.add_argument("--git", "--github",
-                            action='version', version="https://github.com/MarkusHammer/gitautobackup",
+                            action='version',
+                            version="https://github.com/MarkusHammer/gitautobackup",
                             help="Give a link to the github repo page")
 
         args = parser.parse_args(argv)
@@ -637,7 +882,11 @@ def main(*argv:str, prog_arg: Union[str, None] = None) -> bool:
         elif args.quiet:
             verbose = False
     else:
-        print("Argparse could not be loaded/found, please note that this will mean that explicitly specifying the path form the cli is required and all other cli arguments are not available")
+        print("Argparse could not be loaded/found,",
+              "please note that this will mean that explicitly specifying",
+              "the path form the cli is required and all other cli arguments",
+              "are not available."
+              )
         further_guess_paths = False
 
         next_is_message = False
@@ -659,8 +908,12 @@ def main(*argv:str, prog_arg: Union[str, None] = None) -> bool:
                     """
                     -h or --help shows this
                     -m or --message specifies a message for the commit
-                    All other arguments given will be tested for being a valid repository. The first one found will be the one selected.
-                    To receive a better command line experience please install 'argparse' to your python environment!""")
+                    All other arguments given will be tested for being a valid repository.
+                    The first one found will be the one selected.
+                    To receive a better command line experience please install
+                    'argparse' to your python environment!
+                    """
+                )
                 return False
 
             elif arglet.lower() == "-p" or arglet.lower() == "--path":
@@ -677,7 +930,19 @@ def main(*argv:str, prog_arg: Union[str, None] = None) -> bool:
     if verbose:
         print("Making auto backup")
 
-    return main_cli(path, commit_message=commit_message, further_guess_paths=further_guess_paths, force_commit=force_commit, tag = tag, tag_message = tag_message, force_tag = force_tag, force_cleanup=force_cleanup, cleanup_aggressive = cleanup_aggressive, archive_paths = archive_path, archive_format = archive_format, verbose=verbose)
+    return main_cli(path,
+                    commit_message=commit_message,
+                    further_guess_paths=further_guess_paths,
+                    force_commit=force_commit,
+                    tag = tag,
+                    tag_message = tag_message,
+                    force_tag = force_tag,
+                    force_cleanup=force_cleanup,
+                    cleanup_aggressive = cleanup_aggressive,
+                    archive_paths = archive_path,
+                    archive_format = archive_format,
+                    verbose=verbose
+                    )
 
 
 if __name__ == "__main__":  # this is the only way the CLI could be run
@@ -685,22 +950,37 @@ if __name__ == "__main__":  # this is the only way the CLI could be run
     from sys import exit as end
     from sys import argv as cliargv
 
-    def _main_entry():
-        """PRIVATE USED TO RUN DIRECTLY FORM THE COMMAND LINE DO NOT USE THIS IF USING THIS AS A MODULE"""
-        exitcode = -1  # while this is the default error code, -1 is also always used for an unknown error
+    def __main_entry():
+        """
+        PRIVATE
+        USED TO RUN DIRECTLY FORM THE COMMAND LINE
+        DO NOT USE THIS IF USING THIS AS A MODULE
+        """
+        # while this is the default error code,
+        # -1 is also always used for an unknown error
+        exitcode = -1
         try:
-            exitcode = 0 if main(*tuple(cliargv[1:]), prog_arg=cliargv[0]) else 1 #1 means no error but also no changes, 0 is no error and changes where made
+            ret = main(*tuple(cliargv[1:]), prog_arg=cliargv[0])
+            # 1 means no error but also no changes, 0 is no error and changes where made
+            exitcode = 0 if ret else 1
         except GitCommandNotFound:
-            print("Your system is not set up properly for use with the GitPython module. Please refer to it's documentation for setting it up before running this script.")
+            print("Your system is not set up properly for use with the GitPython module.",
+                  "Please refer to it's documentation for setting it up before running this script."
+                  )
             exitcode = -2
         except (NoSuchPathError, FileNotFoundError, PermissionError):
-            print("The given path does not exist on this system or could not be accessed by this user.")
+            print("The given path does not exist on this",
+                  "system or could not be accessed by this user."
+                  )
             exitcode = -3
         except InvalidGitRepositoryError:
             print("The folder given is not a git repo, or is bare.")
             exitcode = -4
         except RepositoryDirtyError:
-            print("The repository already has some changes that could end up being overwritten. Please Handle these first before running this.")
+            print("The repository already has some changes that could",
+                  "end up being overwritten.",
+                  "Please handle these first before running this script."
+                  )
             exitcode = -5
         except InvalidArchiveFormatError as exc:
             print(str(exc))
@@ -716,4 +996,4 @@ if __name__ == "__main__":  # this is the only way the CLI could be run
             exitcode = -1  # The error code always used for an unknown error
         end(exitcode)
 
-    _main_entry()
+    __main_entry()
